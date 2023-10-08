@@ -257,7 +257,13 @@ public class GeneratorContent {
 
         final String name = StringUtils.defaultIfBlank(schema.getName(), parentSchema.getName());
 
-        final String schemaFullName = getSchemaPrefix() + (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name));
+        String schemaFullName = getSchemaPrefix() + (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name));
+
+        // 通用的 extra 处理
+        if ("extra".equals(name)) {
+            schemaFullName = name;
+            parentSchema.addProperty(name, new Schema().$ref("extra"));
+        }
 
         final Components components = getComponents();
 
