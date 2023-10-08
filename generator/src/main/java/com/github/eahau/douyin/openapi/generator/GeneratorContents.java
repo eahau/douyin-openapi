@@ -18,7 +18,6 @@ package com.github.eahau.douyin.openapi.generator;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.Children;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
@@ -35,8 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,13 +76,7 @@ public class GeneratorContents extends LinkedList<GeneratorContent> {
                         .ifPresent(it::setTag))
                 .forEach(it -> {
                     final PathItem pathItem = it.toPathItem();
-                    if (pathItem == null) {
-                        // 不是 http 请求的文档，则删除 tag
-                        tags.stream()
-                                .filter(tag -> it.getDocPath().contains(tag.getName()))
-                                .findFirst()
-                                .ifPresent(tags::remove);
-                    } else {
+                    if (pathItem != null) {
                         openAPI.path(it.getPath(), pathItem);
 
                         final Components components = it.getComponents();

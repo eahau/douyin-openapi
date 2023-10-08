@@ -296,7 +296,8 @@ public class DocField {
                 .name(getName())
                 .description(getDesc())
                 .example(getExample())
-                .required(isRequired());
+                .required(isRequired())
+                .schema(toSchema());
     }
 
     private Schema schema;

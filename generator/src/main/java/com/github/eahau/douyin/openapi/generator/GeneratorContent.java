@@ -17,18 +17,17 @@ package com.github.eahau.douyin.openapi.generator;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.ObjectSchema;
@@ -44,12 +43,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import lombok.SneakyThrows;
-import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -78,7 +77,8 @@ public class GeneratorContent {
     String getSchemaPrefix() {
         if (schemaPrefix == null) {
             final String[] pathArray = getPath().split("/");
-            this.schemaPrefix = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, pathArray[pathArray.length - 1]);
+            final String path = String.join("_", ArrayUtils.subarray(pathArray, pathArray.length - 2, pathArray.length));
+            this.schemaPrefix = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
         }
         return schemaPrefix;
     }
@@ -251,29 +251,45 @@ public class GeneratorContent {
 
         final Map<String, Schema> properties = (items != null ? items : schema).getProperties();
 
-        if (MapUtils.isNotEmpty(properties)) {
-            final String name = schema.getName();
+        if (MapUtils.isEmpty(properties)) {
+            return;
+        }
 
-            final Components components = getComponents();
+        final String name = StringUtils.defaultIfBlank(schema.getName(), parentSchema.getName());
 
-            final Schema existSchema = components.getSchemas().get(name);
-            if (schema.equals(existSchema)) {
-                parentSchema.addProperty(name, new Schema().$ref(existSchema.get$ref()));
-                return;
-            }
+        final String schemaFullName = getSchemaPrefix() + (CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name));
 
-            final String schemaFullName = getSchemaPrefix() + (CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name));
+        final Components components = getComponents();
 
-            if (items != null) {
-                schema.setItems(null);
-            }
-            components.addSchemas(schemaFullName, schema);
+        final Schema existSchema = components.getSchemas().get(schemaFullName);
+        if (schema.equals(existSchema)) {
+            parentSchema.addProperty(name, new Schema().$ref(existSchema.get$ref()));
+            return;
+        }
 
-            parentSchema.addProperty(name, new Schema().$ref(schemaFullName));
+        if (schema instanceof ArraySchema) {
+            // 当前字段是数组，修改为 ref
+            parentSchema.addProperty(name,
+                    new ArraySchema()
+                            .example(schema.getExample())
+                            .description(schema.getDescription())
+                            .items(new Schema().$ref(schemaFullName))
+            );
 
-            for (final Schema value : properties.values()) {
-                addSchema(schema, value);
-            }
+            // 并且将 ref 修改为 object
+            schema = new ObjectSchema()
+                    .name(name)
+                    .properties(properties)
+                    .example(schema.getExample())
+                    .description(schema.getDescription());
+        } else {
+            parentSchema.addProperty(name, new ObjectSchema().$ref(schemaFullName));
+        }
+
+        components.addSchemas(schemaFullName, schema);
+
+        for (final Schema value : properties.values()) {
+            addSchema(schema, value);
         }
 
     }
@@ -301,30 +317,30 @@ public class GeneratorContent {
     @SneakyThrows
     Operation getOperation() {
 
+        final String docUrl = Misc.DOC_BASE_URL + getDocPath();
+        final String desc = "[" + getTitle() + "]" + "(" + docUrl + ")";
+
         final Operation operation = new Operation()
                 .addTagsItem(getTag())
-                .description(getDesc())
+                .description(desc)
                 .addServersItem(new Server().url("https://open.douyin.com/"));
 
-        final HttpMethod httpMethod = getMethod();
-        if (httpMethod == HttpMethod.GET) {
-            getQueryFields()
+        final List<DocField> queryFields = getQueryFields();
+
+        if (CollectionUtils.isNotEmpty(queryFields)) {
+            queryFields
                     .stream()
                     .map(it -> it.toParameter(QueryParameter::new))
                     .forEach(operation::addParametersItem);
-        } else {
+        }
+
+        if (CollectionUtils.isNotEmpty(getBodyFields())) {
             operation.requestBody(getRequestBody());
         }
 
         operation.responses(getApiResponses());
 
         return operation;
-    }
-
-    ExternalDocumentation toExternalDocumentation() {
-        return new ExternalDocumentation()
-                .description(getTitle())
-                .url(Misc.DOC_BASE_URL + getDocPath());
     }
 
     public PathItem toPathItem() {
@@ -342,7 +358,7 @@ public class GeneratorContent {
         final PathItem pathItem = new PathItem();
         try {
             pathItem.operation(getMethod(), getOperation());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("docPath {} , build Operation failed.", Misc.DOC_BASE_URL + getDocPath(), e);
             throw e;
         }

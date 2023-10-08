@@ -20,7 +20,6 @@ import com.github.eahau.douyin.openapi.generator.GeneratorContent;
 import com.github.eahau.douyin.openapi.generator.GeneratorContent.GeneratorContentBuilder;
 import com.github.eahau.douyin.openapi.generator.Misc;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.DocResponse;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -35,16 +34,11 @@ import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.linkedin.urls.Url;
-import com.linkedin.urls.detection.UrlDetector;
-import com.linkedin.urls.detection.UrlDetectorOptions;
-import com.vladsch.flexmark.ast.FencedCodeBlock;
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.HtmlBlock;
 import com.vladsch.flexmark.ast.ListBlock;
 import com.vladsch.flexmark.ast.Paragraph;
 import com.vladsch.flexmark.ast.Text;
-import com.vladsch.flexmark.ext.tables.TableCell;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Block;
@@ -55,17 +49,14 @@ import io.swagger.v3.oas.models.servers.Server;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,8 +64,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,7 +242,7 @@ public class HtmlParser {
 
                                 final int length = pathArray.length;
 
-                                final String path = String.join("/", ArrayUtils.subarray(pathArray, length - 2, length));
+                                final String path = "/" + String.join("/", ArrayUtils.subarray(pathArray, length - 2, length));
 
                                 builder.path(path);
                             }
@@ -381,15 +370,12 @@ public class HtmlParser {
             return null;
         }
 
-        Node child = node.getFirstChild();
-        while (child != null) {
-            if (child instanceof Text) {
-                return child.getChars().toString();
-            }
-            child = child.getFirstChild();
-        }
-
-        return null;
+        return Streams.stream(node.getChildIterator())
+                .filter(it -> it instanceof Text)
+                .findFirst()
+                .map(Node::getChars)
+                .map(BasedSequence::toString)
+                .orElse(null);
     }
 
     /**
@@ -411,15 +397,15 @@ public class HtmlParser {
         return Optional.ofNullable(child)
                 .map(Node::getChars)
                 .map(it -> it.split(" "))
-                .map(array -> Arrays.stream(array)
+                .flatMap(array -> Arrays.stream(array)
                         .map(it -> it.chars()
                                 .filter(c -> ((char) c) == '_' || CharUtils.isAsciiAlpha((char) c))
                                 .mapToObj(c -> (char) c)
                                 .map(String::valueOf)
                                 .collect(Collectors.joining()))
                         .findFirst()
-                        .map(String::valueOf)
-                        .orElse(""))
+                        .map(String::valueOf))
+                .filter(StringUtils::isNotBlank)
                 .filter(existObjectClassName)
                 .orElseGet(() -> getPreHeadingText(node.getPrevious(), existObjectClassName));
     }
@@ -500,7 +486,7 @@ public class HtmlParser {
                                 .stream()
                                 .anyMatch(it -> {
                                     // 下文标题==上文提到的字段名
-                                    if (testClzName.equalsIgnoreCase(it.getName())) {
+                                    if (StringUtils.startsWithIgnoreCase(it.getName(), testClzName)) {
                                         return true;
                                     }
 

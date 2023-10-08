@@ -18,7 +18,6 @@ package com.github.eahau.douyin.openapi.generator;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.Children;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.Data;
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.DocResponse;
 import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.DocsResponse;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -26,18 +25,14 @@ import feign.Feign;
 import feign.Logger.Level;
 import feign.gson.GsonDecoder;
 import feign.slf4j.Slf4jLogger;
-import io.swagger.v3.oas.models.PathItem;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -61,19 +56,10 @@ public class Main {
     @SneakyThrows
     public static void main(String[] args) {
 
-        String docPath = "/docs/resource/zh-CN/mini-app/develop/server/pan-knowledge/product/refund-meta-query";
-//        String docPath = "/docs/resource/zh-CN/mini-app/develop/server/pan-knowledge/product/refund-meta-query";
-        final DocResponse response = douYinOpenDocApi.docs(docPath);
-        response.setPath(docPath);
-
-        final GeneratorContent generatorContent = response.toGeneratorContext();
-
-        final PathItem pathItem = generatorContent.toPathItem();
-
         final Stopwatch stopwatch = Stopwatch.createStarted();
 
-        List<Data> data = Collections.emptyList();
-        final DocsResponse docsResponse = douYinOpenDocApi.allDocs(); data = docsResponse.getData();
+        final DocsResponse docsResponse = douYinOpenDocApi.allDocs();
+        final List<Data> data = docsResponse.getData();
 
         for (final Data datum : data) {
 
@@ -134,7 +120,7 @@ public class Main {
                             try {
                                 final GeneratorContents generatorContents = contents.get();
                                 generatorContents.generateOpenApi();
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 log.error("generateOpenApi failed.", e);
                             }
                         });
