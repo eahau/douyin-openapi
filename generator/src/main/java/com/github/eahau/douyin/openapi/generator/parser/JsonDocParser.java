@@ -23,7 +23,6 @@ import j2html.TagCreator;
 import j2html.tags.DomContent;
 import j2html.tags.specialized.TableTag;
 import lombok.AllArgsConstructor;
-import net.steppschuh.markdowngenerator.text.code.CodeBlock;
 import org.apache.commons.collections4.map.DefaultedMap;
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,7 +78,9 @@ public class JsonDocParser {
             if (attributes.has("type")) {
                 if ("codeblock".equals(attributes.get("type").getAsString())) {
                     final String language = attributes.get("language").getAsString();
-                    return new CodeBlock(getSourceFromOps(ops, (o1, o2) -> 0), language).toString();
+                    return "```" + language + System.lineSeparator()
+                            + getSourceFromOps(ops, (o1, o2) -> 0) + System.lineSeparator()
+                            + "```";
                 }
             }
 

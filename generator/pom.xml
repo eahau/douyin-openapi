@@ -98,11 +98,6 @@
     </dependency>
 
     <dependency>
-      <groupId>net.steppschuh.markdowngenerator</groupId>
-      <artifactId>markdowngenerator</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.openapitools</groupId>
       <artifactId>openapi-generator</artifactId>
     </dependency>
