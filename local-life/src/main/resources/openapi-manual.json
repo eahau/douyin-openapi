@@ -1,16 +1,22 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI 列表",
+    "title": "门店管理",
     "version": "0.0.1"
   },
   "externalDocs": {
-    "description": "OpenAPI 列表",
-    "url": "https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/openapi/list"
+    "description": "门店管理",
+    "url": "https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/life.capacity.shop"
   },
   "servers": [
     {
       "url": "https://open.douyin.com/"
     }
-  ]
+  ],
+  "paths": {
+  },
+  "components": {
+    "schemas": {
+    }
+  }
 }

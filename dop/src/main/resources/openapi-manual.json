@@ -12,5 +12,11 @@
     {
       "url": "https://open.douyin.com/"
     }
-  ]
+  ],
+  "paths": {
+  },
+  "components": {
+    "schemas": {
+    }
+  }
 }

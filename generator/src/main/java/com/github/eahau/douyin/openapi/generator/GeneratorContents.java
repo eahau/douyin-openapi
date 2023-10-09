@@ -101,24 +101,52 @@ public class GeneratorContents extends LinkedList<GeneratorContent> {
                 .tags(getTags())
                 .addServersItem(new Server().url("https://open.douyin.com/"));
 
-        final String openApiContent = Json.pretty(openAPI);
-
         final String domain = Arrays.stream(docPath.split("/"))
                 .filter(StringUtils::isNotBlank)
                 .filter(it -> !it.equals(Misc.DOC_LANGUAGE))
                 .findFirst()
                 .get();
 
-        final String filename = String.join("-", domain, "openapi.json");
+        mergeOpenApi(domain, openAPI);
+
+        final String filename = "openapi.json";
+
+        final String openApiContent = Json.pretty(openAPI);
+
+        FileUtils.write(newFile(domain, filename), openApiContent, StandardCharsets.UTF_8);
+
+    }
+
+    File newFile(String domain, String filename) {
 
         final String fullFilename = String.join(
                 "/",
                 System.getProperty("user.dir"),
-                "generator/src/main/resources",
+                domain,
+                "/src/main/resources",
                 filename
         );
 
-        FileUtils.write(new File(fullFilename), openApiContent, StandardCharsets.UTF_8);
+        return new File(fullFilename);
+    }
+
+    /**
+     * 合并自动生成的和人工维护的 openapi.json, 以人工维护的为准.
+     */
+    @SneakyThrows
+    void mergeOpenApi(String domain, OpenAPI openAPI) {
+
+        final String filename = "openapi-manual.json";
+
+        final String openapiManualJson = FileUtils.readFileToString(newFile(domain, filename), StandardCharsets.UTF_8);
+
+        final OpenAPI openApiManual = Json.mapper().readValue(openapiManualJson, OpenAPI.class);
+
+        // merge path
+        openApiManual.getPaths().forEach(openAPI.getPaths()::addPathItem);
+
+        // merge schema
+        openApiManual.getComponents().getSchemas().forEach(openAPI.getComponents()::addSchemas);
 
     }
 

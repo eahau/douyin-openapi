@@ -1,16 +1,22 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI 列表",
+    "title": "OpenAPI 简介",
     "version": "0.0.1"
   },
   "externalDocs": {
-    "description": "OpenAPI 列表",
-    "url": "https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/openapi/list"
+    "description": "OpenAPI 简介",
+    "url": "https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/server-api-introduction"
   },
   "servers": [
     {
       "url": "https://open.douyin.com/"
     }
-  ]
+  ],
+  "paths": {
+  },
+  "components": {
+    "schemas": {
+    }
+  }
 }

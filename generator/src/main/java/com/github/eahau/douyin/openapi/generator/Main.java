@@ -45,7 +45,7 @@ public class Main {
     static final DouYinOpenDocApi douYinOpenDocApi = Feign.builder()
             .logLevel(Level.BASIC)
             .logger(new Slf4jLogger(DouYinOpenDocApi.class))
-            .decoder(new GsonDecoder())
+            .decoder(new GsonDecoder(Misc.GSON))
             .target(DouYinOpenDocApi.class, Misc.DOC_BASE_URL);
 
     static final ExecutorService executorService = new ThreadPoolExecutor(
