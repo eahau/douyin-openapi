@@ -56,6 +56,8 @@ public class Main {
     @SneakyThrows
     public static void main(String[] args) {
 
+        log.info("Hold on, generator started.");
+
         final Stopwatch stopwatch = Stopwatch.createStarted();
 
         final DocsResponse docsResponse = douYinOpenDocApi.allDocs();
