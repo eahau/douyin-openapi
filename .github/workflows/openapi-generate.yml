@@ -24,4 +24,4 @@ jobs:
           path: |
             ~/.m2/repository
       - name: Run generator
-        run: java Main.java
+        run: java com.github.eahau.douyin.openapi.generator.Main.java
