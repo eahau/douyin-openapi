@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator;
+package com.github.eahau.openapi.douyin.generator;
 
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.Children;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenDocApi.Children;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.v3.core.util.Json;

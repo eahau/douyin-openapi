@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator.parser;
+package com.github.eahau.openapi.douyin.generator.parser;
 
-import com.github.eahau.douyin.openapi.generator.DocField;
-import com.github.eahau.douyin.openapi.generator.GeneratorContent;
-import com.github.eahau.douyin.openapi.generator.GeneratorContent.GeneratorContentBuilder;
-import com.github.eahau.douyin.openapi.generator.Misc;
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.DocResponse;
+import com.github.eahau.openapi.douyin.generator.DocField;
+import com.github.eahau.openapi.douyin.generator.GeneratorContent;
+import com.github.eahau.openapi.douyin.generator.GeneratorContent.GeneratorContentBuilder;
+import com.github.eahau.openapi.douyin.generator.Misc;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenDocApi.DocResponse;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

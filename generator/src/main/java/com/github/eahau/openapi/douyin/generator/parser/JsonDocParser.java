@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator.parser;
+package com.github.eahau.openapi.douyin.generator.parser;
 
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenApiListApi.Ops;
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenApiListApi.OpsList;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenApiListApi.Ops;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenApiListApi.OpsList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import j2html.TagCreator;

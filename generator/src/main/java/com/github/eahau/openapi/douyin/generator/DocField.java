@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator;
+package com.github.eahau.openapi.douyin.generator;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;

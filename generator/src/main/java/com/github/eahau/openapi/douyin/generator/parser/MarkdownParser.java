@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator.parser;
+package com.github.eahau.openapi.douyin.generator.parser;
 
-import com.github.eahau.douyin.openapi.generator.DocField;
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenDocApi.DocResponse;
+import com.github.eahau.openapi.douyin.generator.DocField;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenDocApi.DocResponse;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 import com.vladsch.flexmark.ast.Heading;
-import com.vladsch.flexmark.ast.HtmlBlock;
 import com.vladsch.flexmark.ext.tables.TableBlock;
 import com.vladsch.flexmark.ext.tables.TableCell;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
-import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.ContentNode;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
@@ -33,8 +30,6 @@ import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,7 +37,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

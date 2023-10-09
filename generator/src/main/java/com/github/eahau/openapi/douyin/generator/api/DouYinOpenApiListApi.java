@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator.api;
+package com.github.eahau.openapi.douyin.generator.api;
 
-import com.github.eahau.douyin.openapi.generator.Misc;
+import com.github.eahau.openapi.douyin.generator.Misc;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;

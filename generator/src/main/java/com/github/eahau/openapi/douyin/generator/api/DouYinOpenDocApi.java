@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.eahau.douyin.openapi.generator.api;
+package com.github.eahau.openapi.douyin.generator.api;
 
-import com.github.eahau.douyin.openapi.generator.GeneratorContent;
-import com.github.eahau.douyin.openapi.generator.Misc;
-import com.github.eahau.douyin.openapi.generator.api.DouYinOpenApiListApi.ApiListResponse;
-import com.github.eahau.douyin.openapi.generator.parser.HtmlParser;
-import com.github.eahau.douyin.openapi.generator.parser.JsonDocParser;
+import com.github.eahau.openapi.douyin.generator.GeneratorContent;
+import com.github.eahau.openapi.douyin.generator.Misc;
+import com.github.eahau.openapi.douyin.generator.api.DouYinOpenApiListApi.ApiListResponse;
+import com.github.eahau.openapi.douyin.generator.parser.HtmlParser;
+import com.github.eahau.openapi.douyin.generator.parser.JsonDocParser;
 import com.google.common.collect.Lists;
 import feign.Param;
 import feign.RequestLine;
