@@ -126,5 +126,17 @@
 
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <includePluginDependencies>true</includePluginDependencies>
+          <mainClass>com.github.eahau.openapi.douyin.generator.Main</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
