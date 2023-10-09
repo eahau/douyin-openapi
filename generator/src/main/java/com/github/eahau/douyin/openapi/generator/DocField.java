@@ -329,6 +329,7 @@ public class DocField {
         }
         if (StringUtils.containsAny(type, "float", "double")) {
             final Schema numberSchema = new Schema();
+            numberSchema.setType("number");
             return numberSchema.format("double")._default(getDefV());
         }
         if (StringUtils.containsAny(type, "int", "i32")) {

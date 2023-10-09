@@ -17,6 +17,9 @@ package com.github.eahau.douyin.openapi.generator;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Suppliers;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -49,12 +52,17 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Slf4j
 @Getter
@@ -320,6 +328,38 @@ public class GeneratorContent {
                 );
     }
 
+    static final ConcurrentMap<String, String> operationCache = Maps.newConcurrentMap();
+
+    String operationId() {
+        final String[] pathArray = getDocPath().split("/");
+        String lastPath = pathArray[pathArray.length - 1];
+        lastPath = lastPath.replace('-', '_');
+
+        return operationCache.compute(lastPath, (key, oldV) -> {
+
+            final Function<String, String> toOperationId = path -> {
+                final String methodName = getMethod().name().toLowerCase();
+
+                // 候选的 operationId 中有 get post 等关键字，则删除该关键字
+                final String operationId = Stream.of(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE)
+                        .map(Enum::name)
+                        .filter(method -> StringUtils.containsIgnoreCase(path, method))
+                        .findFirst()
+                        .map(method -> path.toLowerCase().replace(method.toLowerCase(), ""))
+                        .map(it -> String.join("_", methodName, it))
+                        .orElseGet(() -> String.join("_", methodName, path));
+
+                return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, operationId);
+            };
+
+            if (oldV == null) {
+                return toOperationId.apply(key);
+            } else {
+                return toOperationId.apply(getPath().replace('/', '_'));
+            }
+        });
+    }
+
     @SneakyThrows
     Operation getOperation() {
 
@@ -327,6 +367,7 @@ public class GeneratorContent {
         final String desc = "[" + getTitle() + "]" + "(" + docUrl + ")";
 
         final Operation operation = new Operation()
+                .operationId(operationId())
                 .addTagsItem(getTag())
                 .description(desc)
                 .addServersItem(new Server().url("https://open.douyin.com/"));
