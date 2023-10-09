@@ -126,7 +126,7 @@ public class HtmlParser {
      */
     private void visit(Heading heading, Consumer<Node> consumer) {
         for (Node next = heading.getNext(); next != null; next = next.getNext()) {
-            if (next instanceof Heading && ((Heading) next).getLevel() == heading.getLevel()) {
+            if (next instanceof Heading && ((Heading) next).getLevel() <= heading.getLevel()) {
                 break;
             }
 
@@ -160,16 +160,23 @@ public class HtmlParser {
                 },
                 it -> {
                     if (it.getLevel() == 2 && StringUtils.equals(getHeadingText(it), "请求参数")) {
-                        final Node next = it.getNext();
-                        if (next instanceof Heading && StringUtils.equalsAny(((Heading) next).getText(), "Query", "URL 请求")) {
-                            parseQuery(it);
-                        } else {
-                            parseBody(it);
-                        }
+                        visit(it, next -> {
+                            if (!(next instanceof Heading)) {
+                                return;
+                            }
+                            final String headingText = getHeadingText(next);
+                            if (StringUtils.contains(headingText, "Header")) {
+                                parseHeader(next);
+                            } else if (StringUtils.contains(headingText, "Body")) {
+                                parseBody(next);
+                            } else if (StringUtils.containsAny(headingText, "Query", "URL 请求")) {
+                                parseQuery(next);
+                            }
+                        });
                     }
                 },
                 it -> {
-                    if (it.getLevel() == 2 && StringUtils.contains(getHeadingText(it), "响应参数")) {
+                    if (it.getLevel() == 2 && StringUtils.containsAny(getHeadingText(it), "响应参数", "返回值")) {
                         parseResponse(it);
                     }
                 },
@@ -237,14 +244,16 @@ public class HtmlParser {
                             if (httpUrl.contains("/") && httpUrl.chars().allMatch(c -> CharUtils.isAscii((char) c))) {
                                 builder.path(httpUrl);
                             } else {
+                                builder.callback(true);
+                                log.info("需要配置回调地址，但暂不支持 callback, docUrl {}", Misc.DOC_BASE_URL + response.getPath());
 
-                                final String[] pathArray = response.getPath().split("/");
-
-                                final int length = pathArray.length;
-
-                                final String path = "/" + String.join("/", ArrayUtils.subarray(pathArray, length - 2, length));
-
-                                builder.path(path);
+//                                final String[] pathArray = response.getPath().split("/");
+//
+//                                final int length = pathArray.length;
+//
+//                                final String path = "/" + String.join("/", ArrayUtils.subarray(pathArray, length - 2, length));
+//
+//                                builder.path(path);
                             }
                         } else {
                             final StringTokenizer tokenizer = httpUrl.contains("：") ? new StringTokenizer(httpUrl, "：") : null;
@@ -259,12 +268,15 @@ public class HtmlParser {
                                             .collect(Collectors.joining());
                                 }
 
-                                builder.path(url.getPath())
-                                        .addServer(
-                                                new Server()
-                                                        .url(url.getProtocol() + ":" + url.getHost())
-                                                        .description(desc)
-                                        );
+                                builder.path(url.getPath());
+
+                                if (!Misc.API_BASE_URL.contains(url.getHost())) {
+                                    builder.addServer(
+                                            new Server()
+                                                    .url(url.getProtocol() + "://" + url.getHost())
+                                                    .description(desc)
+                                    );
+                                }
                             }
                         }
                     });
@@ -297,16 +309,18 @@ public class HtmlParser {
                             } else {
                                 final URL url = urls.get(0);
                                 path = url.getPath();
-                                builder.addServer(
-                                        new Server()
-                                                .url(url.getProtocol() + ":" + url.getHost())
-                                                .description(
-                                                        Optional.ofNullable(next.getPrevious())
-                                                                .map(Node::getChildChars)
-                                                                .map(String::valueOf)
-                                                                .orElse(null)
-                                                )
-                                );
+                                if (!url.toString().startsWith(Misc.API_BASE_URL)) {
+                                    builder.addServer(
+                                            new Server()
+                                                    .url(url.getProtocol() + ":" + url.getHost())
+                                                    .description(
+                                                            Optional.ofNullable(next.getPrevious())
+                                                                    .map(Node::getChildChars)
+                                                                    .map(String::valueOf)
+                                                                    .orElse(null)
+                                                    )
+                                    );
+                                }
                             }
 
                             builder.path(path);
@@ -346,15 +360,17 @@ public class HtmlParser {
     }
 
     protected void parseQuery(Node node) {
-        Stream.of(HtmlBlock.class, Paragraph.class)
-                .map(node::getNextAny)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Node::getChars)
-                .map(String::valueOf)
-                .map(Jsoup::parse)
-                .map(this::parseTableOrData)
-                .ifPresent(builder::queryFields);
+        final Heading heading = (Heading) ((node instanceof Heading) ? node : node.getPreviousAny(Heading.class));
+        visit(heading, next -> {
+            if (next instanceof HtmlBlock || next instanceof Paragraph) {
+                Optional.of(next)
+                        .map(Node::getChars)
+                        .map(String::valueOf)
+                        .map(Jsoup::parse)
+                        .map(this::parseTableOrData)
+                        .ifPresent(builder::queryFields);
+            }
+        });
     }
 
     protected void parseBody(Node node) {
@@ -630,6 +646,7 @@ public class HtmlParser {
 
                     return docField;
                 })
+                .filter(it -> StringUtils.isNotBlank(it.getName()))
                 .collect(Collectors.toList());
     }
 

@@ -22,7 +22,9 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.FileSchema;
+import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
+import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -316,31 +318,35 @@ public class DocField {
     }
 
     Schema toPrimitiveSchemaOrNull(String type) {
+        final String defV = getDefV();
         if (type.contains("bool")) {
-            return new BooleanSchema()._default(Boolean.parseBoolean(getDefV()));
+            return new BooleanSchema()._default(Boolean.parseBoolean(defV));
         }
         if (StringUtils.equalsAnyIgnoreCase(type, "sting", "string")) {
-            return new StringSchema()._default(getDefV());
-        }
-        if (type.equals("number")) {
-            final Schema schema = new Schema();
-            schema.setType("number");
-            return schema._default(getDefV());
-        }
-        if (StringUtils.containsAny(type, "float", "double")) {
-            final Schema numberSchema = new Schema();
-            numberSchema.setType("number");
-            return numberSchema.format("double")._default(getDefV());
+            return new StringSchema()._default(defV);
         }
         if (StringUtils.containsAny(type, "int", "i32")) {
-            final Schema numberSchema = new Schema();
-            numberSchema.setType("integer");
-            return numberSchema.format("int32")._default(getDefV());
+            final IntegerSchema numberSchema = new IntegerSchema();
+            if (NumberUtils.isCreatable(defV)) {
+                numberSchema._default(NumberUtils.toInt(defV));
+            }
+            return numberSchema;
         }
         if (StringUtils.containsAny(type, "i64", "int64", "long")) {
+            final IntegerSchema numberSchema = new IntegerSchema();
+            numberSchema.type("integer").format("int64");
+            if (NumberUtils.isCreatable(defV)) {
+                numberSchema._default(NumberUtils.toLong(defV));
+            }
+            return numberSchema;
+        }
+        if (StringUtils.containsAny(type, "float", "double", "number")) {
             final Schema numberSchema = new Schema();
-            numberSchema.setType("integer");
-            return numberSchema.format("int64")._default(getDefV());
+            numberSchema.type("number").format("double");
+            if (NumberUtils.isCreatable(defV)) {
+                numberSchema._default(NumberUtils.toDouble(defV));
+            }
+            return numberSchema;
         }
         if (isBinaryType()) {
             return new FileSchema();
@@ -364,12 +370,16 @@ public class DocField {
         return paramType;
     }
 
+    boolean isPrimitiveArrayType() {
+        return isArrayType() && isPrimitiveType(getLastParamType());
+    }
+
     Schema toObjectSchema() {
         final List<DocField> children = getChildren();
         final Schema schema;
         final DocField childField;
-        if (children.size() == 1 && !(childField = children.get(0)).isObjectType()) {
-            schema = new Schema().type(childField.getType());
+        if (children.size() == 1 && !(childField = children.get(0)).isObjectType() && !childField.isPrimitiveArrayType()) {
+            schema = childField.toSchema();
         } else {
             final Map<String, Schema> properties = children
                     .stream()
@@ -389,20 +399,21 @@ public class DocField {
 
             final String type = getType();
 
+            final String defV = getDefV();
             if (isArrayObject()) {
-                setSchema(new ArraySchema().items(toObjectSchema())._default(getDefV()));
-            } else if (isObjectType()) {
-                setSchema(toObjectSchema()._default(getDefV()));
-            } else if (isMapType()) {
-                final String paramType = getLastParamType();
-                final Schema schema = Optional.ofNullable(toPrimitiveSchemaOrNull(paramType))
-                        .orElseGet(this::toObjectSchema);
-                setSchema(new MapSchema().additionalProperties(schema)._default(getDefV()));
+                setSchema(new ArraySchema().items(toObjectSchema())._default(defV));
             } else if (isArrayType()) {
                 final String paramType = getLastParamType();
                 final Schema schema = Optional.ofNullable(toPrimitiveSchemaOrNull(paramType))
                         .orElseGet(this::toObjectSchema);
-                setSchema(new ArraySchema().items(schema)._default(getDefV()));
+                setSchema(new ArraySchema().items(schema)._default(defV));
+            } else if (isObjectType()) {
+                setSchema(toObjectSchema()._default("{}".equals(defV) ? null : defV));
+            } else if (isMapType()) {
+                final String paramType = getLastParamType();
+                final Schema schema = Optional.ofNullable(toPrimitiveSchemaOrNull(paramType))
+                        .orElseGet(this::toObjectSchema);
+                setSchema(new MapSchema().additionalProperties(schema)._default(defV));
             } else {
                 setSchema(toPrimitiveSchema(type));
             }

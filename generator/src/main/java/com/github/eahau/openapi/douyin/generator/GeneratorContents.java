@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -99,7 +100,7 @@ public class GeneratorContents extends LinkedList<GeneratorContent> {
                                 .url(Misc.DOC_BASE_URL + Misc.DOC_URI + docPath)
                 )
                 .tags(getTags())
-                .addServersItem(new Server().url("https://open.douyin.com/"));
+                .addServersItem(new Server().url(Misc.API_BASE_URL));
 
         final String domain = Arrays.stream(docPath.split("/"))
                 .filter(StringUtils::isNotBlank)
@@ -143,10 +144,15 @@ public class GeneratorContents extends LinkedList<GeneratorContent> {
         final OpenAPI openApiManual = Json.mapper().readValue(openapiManualJson, OpenAPI.class);
 
         // merge path
-        openApiManual.getPaths().forEach(openAPI.getPaths()::addPathItem);
+        Optional.ofNullable(openApiManual)
+                .map(OpenAPI::getPaths)
+                .ifPresent(it -> it.forEach(openAPI.getPaths()::addPathItem));
 
         // merge schema
-        openApiManual.getComponents().getSchemas().forEach(openAPI.getComponents()::addSchemas);
+        Optional.ofNullable(openApiManual)
+                .map(OpenAPI::getComponents)
+                .map(Components::getSchemas)
+                .ifPresent(it -> it.forEach(openAPI.getComponents()::addSchemas));
 
     }
 

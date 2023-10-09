@@ -20,6 +20,8 @@ import com.google.gson.GsonBuilder;
 
 public interface Misc {
 
+    String API_BASE_URL = "https://open.douyin.com";
+
     String DOC_BASE_URL = "https://developer.open-douyin.com";
 
     String DOC_URI = "/docs/resource";

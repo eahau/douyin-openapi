@@ -32,6 +32,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -112,6 +113,8 @@ public class GeneratorContent {
 
     private final boolean respFieldNeedRebuild;
 
+    private final boolean callback;
+
     @Default
     @Setter
     private Components components = new Components().schemas(Maps.newLinkedHashMap());
@@ -140,12 +143,20 @@ public class GeneratorContent {
     }
 
     Schema<Object> buildReqBodySchema() {
-        final Schema<Object> rootSchema = new ObjectSchema();
+        final Schema<Object> responseSchema = new ObjectSchema().name(getSchemaPrefix() + "Request");
 
-        getBodyFields()
-                .stream()
-                .filter(DocField::isRootObject)
-                .forEach(it -> rootSchema.addProperty(it.getName(), it.toSchema()));
+        getComponents().addSchemas(responseSchema.getName(), responseSchema);
+
+        final Schema<Object> rootSchema = new ObjectSchema().$ref(responseSchema.getName());
+
+        getBodyFields().forEach(docField -> {
+            final Schema<?> schema = docField.toSchema();
+            if (MapUtils.isNotEmpty(schema.getProperties()) || schema.getItems() != null) {
+                addSchema(responseSchema, schema);
+            } else {
+                responseSchema.addProperty(docField.getName(), schema);
+            }
+        });
 
         return rootSchema;
     }
@@ -325,33 +336,19 @@ public class GeneratorContent {
     static final ConcurrentMap<String, String> operationCache = Maps.newConcurrentMap();
 
     String operationId() {
-        final String[] pathArray = getDocPath().split("/");
-        String lastPath = pathArray[pathArray.length - 1];
-        lastPath = lastPath.replace('-', '_');
+        final String path = getPath().replace('/', '_');
+        final String methodName = getMethod().name().toLowerCase();
 
-        return operationCache.compute(lastPath, (key, oldV) -> {
+        // 候选的 operationId 中有 get post 等关键字，则删除该关键字
+        final String operationId = Stream.of(HttpMethod.GET, HttpMethod.POST)
+                .map(Enum::name)
+                .filter(method -> StringUtils.containsIgnoreCase(path, method))
+                .findFirst()
+                .map(method -> path.toLowerCase().replace(method.toLowerCase(), ""))
+                .map(it -> String.join("_", methodName, it))
+                .orElseGet(() -> String.join("_", methodName, path));
 
-            final Function<String, String> toOperationId = path -> {
-                final String methodName = getMethod().name().toLowerCase();
-
-                // 候选的 operationId 中有 get post 等关键字，则删除该关键字
-                final String operationId = Stream.of(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE)
-                        .map(Enum::name)
-                        .filter(method -> StringUtils.containsIgnoreCase(path, method))
-                        .findFirst()
-                        .map(method -> path.toLowerCase().replace(method.toLowerCase(), ""))
-                        .map(it -> String.join("_", methodName, it))
-                        .orElseGet(() -> String.join("_", methodName, path));
-
-                return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, operationId);
-            };
-
-            if (oldV == null) {
-                return toOperationId.apply(key);
-            } else {
-                return toOperationId.apply(getPath().replace('/', '_'));
-            }
-        });
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, operationId);
     }
 
     @SneakyThrows
@@ -363,8 +360,7 @@ public class GeneratorContent {
         final Operation operation = new Operation()
                 .operationId(operationId())
                 .addTagsItem(getTag())
-                .description(desc)
-                .addServersItem(new Server().url("https://open.douyin.com/"));
+                .description(desc);
 
         final List<DocField> queryFields = getQueryFields();
 
@@ -372,6 +368,14 @@ public class GeneratorContent {
             queryFields
                     .stream()
                     .map(it -> it.toParameter(QueryParameter::new))
+                    .forEach(operation::addParametersItem);
+        }
+
+        final List<DocField> headFields = getHeadFields();
+
+        if (CollectionUtils.isNotEmpty(headFields)) {
+            headFields.stream()
+                    .map(it -> it.toParameter(HeaderParameter::new))
                     .forEach(operation::addParametersItem);
         }
 
@@ -386,12 +390,13 @@ public class GeneratorContent {
 
     public PathItem toPathItem() {
 
+        // 不是 http api 文档
         if (getMethod() == null) {
             return null;
         }
 
         final String path = getPath();
-        if (path == null) {
+        if (path == null || isCallback()) {
             log.warn("docPath {}, path is null, ignored.", Misc.DOC_BASE_URL + getDocPath());
             return null;
         }
@@ -404,7 +409,10 @@ public class GeneratorContent {
             throw e;
         }
 
-        pathItem.servers(getServerList());
+        final List<Server> serverList = getServerList();
+        if (CollectionUtils.isNotEmpty(serverList)) {
+            pathItem.servers(serverList);
+        }
 
         return pathItem;
     }

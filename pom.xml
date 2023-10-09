@@ -388,7 +388,7 @@
         <packageName>${project.groupId}.${project.parent.artifactId}.${project.name}</packageName>
         <openapi.generator.maven.plugin.groupId>${project.parent.groupId}.${project.parent.artifactId}</openapi.generator.maven.plugin.groupId>
         <openapi.generator.maven.plugin.artifactId>${project.artifactId}</openapi.generator.maven.plugin.artifactId>
-        <!--    <openapi.generator.maven.plugin.skipValidateSpec>true</openapi.generator.maven.plugin.skipValidateSpec>-->
+        <openapi.generator.maven.plugin.skipValidateSpec>true</openapi.generator.maven.plugin.skipValidateSpec>
         <openapi.generator.maven.plugin.library>feign</openapi.generator.maven.plugin.library>
         <openapi.generator.maven.plugin.generatorName>java</openapi.generator.maven.plugin.generatorName>
         <openapi.generator.maven.plugin.packageName>${packageName}</openapi.generator.maven.plugin.packageName>
@@ -398,68 +398,6 @@
         <openapi.generator.maven.plugin.generateModelTests>false</openapi.generator.maven.plugin.generateModelTests>
         <openapi.generator.maven.plugin.generateApiTests>false</openapi.generator.maven.plugin.generateApiTests>
       </properties>
-
-      <dependencies>
-
-        <!-- @Nullable annotation -->
-        <dependency>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-          <version>3.0.2</version>
-        </dependency>
-
-        <dependency>
-          <groupId>io.github.openfeign</groupId>
-          <artifactId>feign-core</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>io.github.openfeign</groupId>
-          <artifactId>feign-okhttp</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>io.github.openfeign</groupId>
-          <artifactId>feign-jackson</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>io.github.openfeign</groupId>
-          <artifactId>feign-slf4j</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>io.github.openfeign.form</groupId>
-          <artifactId>feign-form</artifactId>
-        </dependency>
-
-        <!-- JSON processing: jackson -->
-        <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.openapitools</groupId>
-          <artifactId>jackson-databind-nullable</artifactId>
-          <version>${jackson-databind-nullable.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.jackson.datatype</groupId>
-          <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>jakarta.annotation</groupId>
-          <artifactId>jakarta.annotation-api</artifactId>
-          <version>${jakarta-annotation.version}</version>
-          <scope>provided</scope>
-        </dependency>
-
-      </dependencies>
 
     </profile>
   </profiles>
