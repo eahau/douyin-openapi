@@ -1,11 +1,11 @@
-name: Publish package to the Maven Central Repository
-# on:
-#   release:
-#     types: [created]
+name: Publish jar to the Maven
 on:
-  push:
-    branches:
-      - dev
+  release:
+    types: [created]
+# on:
+#   push:
+#     branches:
+#       - dev
 
 jobs:
   publish:
