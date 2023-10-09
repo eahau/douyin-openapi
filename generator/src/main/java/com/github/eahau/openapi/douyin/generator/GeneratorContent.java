@@ -388,18 +388,22 @@ public class GeneratorContent {
         return operation;
     }
 
-    public PathItem toPathItem() {
-
+    public boolean accept() {
         // 不是 http api 文档
         if (getMethod() == null) {
-            return null;
+            return false;
         }
 
         final String path = getPath();
         if (path == null || isCallback()) {
-            log.warn("docPath {}, path is null, ignored.", Misc.DOC_BASE_URL + getDocPath());
-            return null;
+//            log.warn("docPath {}, path is null, ignored.", Misc.DOC_BASE_URL + getDocPath());
+            return false;
         }
+
+        return true;
+    }
+
+    public PathItem toPathItem() {
 
         final PathItem pathItem = new PathItem();
         try {

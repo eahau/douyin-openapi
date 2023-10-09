@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +71,9 @@ public class GeneratorContents extends LinkedList<GeneratorContent> {
         final OpenAPI openAPI = this.openAPI;
 
         stream()
+                .filter(GeneratorContent::accept)
+                // 根据 path 排序，避免每次构建后 openapi.json 因为顺序改变而产生 change
+                .sorted(Comparator.comparing(GeneratorContent::getPath))
                 .peek(it -> tags.stream()
                         .filter(tag -> it.getDocPath().contains(tag.getName()))
                         .findFirst()
