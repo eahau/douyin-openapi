@@ -10,6 +10,6 @@
 
 可根据以下 openapi.json 文件，生成相应的 http client 代码，具体用法请见[openapi-generator](https://github.com/OpenAPITools/openapi-generator)
 
-- [小程序](./generator/src/main/resources/mini-app-openapi.json)
-- [移动/网站应用](./generator/src/main/resources/dop-openapi.json)
-- [生活服务商家应用](./generator/src/main/resources/local-life-openapi.json)
+- [小程序](./mini-app/src/main/resources/openapi.json)
+- [移动/网站应用](./dop/src/main/resources/openapi.json)
+- [生活服务商家应用](./local-life/src/main/resources/openapi.json)
