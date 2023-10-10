@@ -620,45 +620,34 @@
     },
     "/goodlife/v1/fulfilment/create/callback/" : {
       "post" : {
-        "tags" : [ "tripartite.code" ],
-        "description" : "[发券回调](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/tripartite.code/callback)",
+        "tags" : [ "JiuLv" ],
+        "description" : "[凭证回调（异步发券OpenAPI）](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/booking/code-callback)",
         "operationId" : "postGoodlifeV1FulfilmentCreateCallback",
         "parameters" : [ {
-          "name" : "Content-Type",
+          "name" : "content-type",
           "in" : "header",
-          "description" : "application/json",
+          "description" : "固定值 \"application/json\"",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "application/json",
+            "description" : "固定值 \"application/json\"",
             "default" : "application/json",
             "example" : null
           }
         }, {
           "name" : "access-token",
           "in" : "header",
-          "description" : "根据这个地址获取的token",
+          "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "根据这个地址获取的token",
+            "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
             "example" : null
           }
         } ],
-        "requestBody" : {
-          "description" : "1、(非必需) 抖音侧先申请服务商发码，如果能同步返回结果则不需要本接口，如果异步返回结果则调用本接口通知抖音。\n2、error_code 为 0 代表通知成功，如未成功请重试。\n3、10 分钟后未发码，抖音会发起退款申请。如需要补发，通过退款接口拒绝退款时补发券码。\n\n",
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateCallbackRequest"
-              }
-            }
-          },
-          "required" : true
-        },
         "responses" : {
           "default" : {
-            "description" : "发券回调",
+            "description" : "凭证回调（异步发券OpenAPI）",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -666,7 +655,7 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n  \"data\": \"xxx\",\n  \"certificate_info_list\": [\n      {\n        \"certificate_id\": \"123123123123\",\n        \"code\": \"ABACCC\"\n      },\n      {\n        \"certificate_id\": \"923123123123\",\n        \"code\": \"ABACCC\"\n      }\n    ],\n    \"error_code\": 0,\n    \"description\": \"success\"\n},\n\"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"xxx\"\n  }\n}\n]\n"
+                    "value" : "[{\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"2020070614111601022506808001045D59\",\n    \"now\": 1651131270\n  }\n}\n]\n"
                   },
                   "failed" : {
                     "value" : null
@@ -727,6 +716,224 @@
                 "examples" : {
                   "succeed" : {
                     "value" : "[{\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"2020070614111601022506808001045D59\"\n  }\n}\n]\n"
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/fulfilment/reserve_code/batch_import/" : {
+      "get" : {
+        "tags" : [ "reservecode" ],
+        "description" : "[批量增加券码](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/reservecode/batchimport)",
+        "operationId" : "getGoodlifeV1FulfilmentReserveCodeBatchImport",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "商家/服务商通过该接口提前将生成的券码同步至抖音侧进行存储。一次导入最多 500 个，抖音侧会对每一批次的券码进行验重，如果当前券码存在重复，那么这一批次的券码均会同步失败，故需要三方确保同步的券码是唯一不重复的。\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ReserveCodeBatchImportRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "批量增加券码",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReserveCodeBatchImportResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/fulfilment/reserve_code/bind_order_info/" : {
+      "get" : {
+        "tags" : [ "reservecode" ],
+        "description" : "[查询券码对应订单信息](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/reservecode/bind.order.info)",
+        "operationId" : "getGoodlifeV1FulfilmentReserveCodeBindOrderInfo",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "1、特殊场景下，如三方没有获取到抖音侧推送的订单信息，但用户实际到店使用核销时，可以通过此接口根据券码主动查询抖音侧的订单信息。然后进行核销处理。",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ReserveCodeBindOrderInfoRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "查询券码对应订单信息",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReserveCodeBindOrderInfoResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/goods/calendar_static_attr_group/save/" : {
+      "post" : {
+        "tags" : [ "JiuLv" ],
+        "description" : "[保存日历属性](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/presale/savecalendar)",
+        "operationId" : "postGoodlifeV1GoodsCalendarStaticAttrGroupSave",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "1、创建或更新商品日历\n2、需要在创建了酒旅预定商品后调用\n3、Calendar 属性，需要通过模板获取\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "保存日历属性",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/goods/calendar_stock_group/save/" : {
+      "post" : {
+        "tags" : [ "JiuLv" ],
+        "description" : "[保存日历库存](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/presale/savestock)",
+        "operationId" : "postGoodlifeV1GoodsCalendarStockGroupSave",
+        "requestBody" : {
+          "description" : "1、创建或更新商品日历库存\n2、需要在创建了酒旅预定商品后调用\n3、预定商品的库存依赖服务商进行库存同步更新，此接口用于预定库存\n注意：\n\n* 日历范围不建议太长，最多90天（暂）；\n* 如果更新某一日期的库存，只需传入某一天的库存日期以及库存值即可；\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CalendarStockGroupSaveRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "保存日历库存",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CalendarStockGroupSaveResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
                   },
                   "failed" : {
                     "value" : null
@@ -1393,6 +1600,66 @@
         }
       }
     },
+    "/goodlife/v1/goods/spu/save/" : {
+      "post" : {
+        "tags" : [ "JiuLv" ],
+        "description" : "[保存SPU](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/presale/savespu)",
+        "operationId" : "postGoodlifeV1GoodsSpuSave",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的 token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的 token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "TravelerNumStruct 结构如下：",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpuSaveRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "保存SPU",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SpuSaveResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/goodlife/v1/goods/stock/sync/" : {
       "post" : {
         "tags" : [ "goods" ],
@@ -1904,6 +2171,66 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/UserUpdateResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/partner/order/create/" : {
+      "post" : {
+        "tags" : [ "paterner" ],
+        "description" : "[创建合作关系](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/paterner/create)",
+        "operationId" : "postGoodlifeV1PartnerOrderCreate",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "无\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "创建合作关系",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OrderCreateResponse"
                 },
                 "examples" : {
                   "succeed" : {
@@ -3055,6 +3382,85 @@
         }
       }
     },
+    "/goodlife/v1/trade/book/get/" : {
+      "get" : {
+        "tags" : [ "JiuLv" ],
+        "description" : "[查询预约单](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/presale/bookingorderquery)",
+        "operationId" : "getGoodlifeV1TradeBook",
+        "parameters" : [ {
+          "name" : "book_id",
+          "in" : "query",
+          "description" : "预约单id",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "description" : "预约单id",
+            "example" : null
+          }
+        }, {
+          "name" : "order_id",
+          "in" : "query",
+          "description" : "抖音订单id",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "description" : "抖音订单id",
+            "example" : null
+          }
+        }, {
+          "name" : "account_id",
+          "in" : "query",
+          "description" : "商户id（同创建商品传入的商户id一致）",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "商户id（同创建商品传入的商户id一致）",
+            "example" : null
+          }
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "查询预约单",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BookGetResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/goodlife/v1/trade/buy/merchant_confirm_order/" : {
       "post" : {
         "tags" : [ "takeout" ],
@@ -3609,7 +4015,7 @@
           }
         } ],
         "requestBody" : {
-          "description" : "<ul><li>该接口同时支持新增某个规则的价格库存和更新现有规则的价格库存</li><li>最多只支持90天内的价格库存数据传输</li><li>已上线（审核通过）商品才能同步价格库存</li></ul>\n\n",
+          "description" : "* 该接口同时支持新增某个规则的价格库存和更新现有规则的价格库存\n* 最多只支持90天内的价格库存数据传输\n* 已上线（审核通过）商品才能同步价格库存\n\n",
           "content" : {
             "application/json" : {
               "schema" : {
@@ -5210,27 +5616,6 @@
         "description" : "团购信息",
         "example" : null
       },
-      "CreateCallbackResponse" : {
-        "type" : "object",
-        "properties" : {
-          "data" : {
-            "type" : "object",
-            "properties" : { },
-            "example" : null
-          },
-          "certificate_info_list" : {
-            "$ref" : "#/components/schemas/CreateCallbackCertificateInfoList"
-          },
-          "extra" : {
-            "$ref" : "#/components/schemas/extra"
-          },
-          "logid" : {
-            "type" : "string",
-            "description" : "抖音侧排查问题的标示",
-            "example" : null
-          }
-        }
-      },
       "CreateCallbackRequest" : {
         "type" : "object",
         "properties" : {
@@ -5347,6 +5732,14 @@
         "description" : "可自定义的项目（例：景区项目索道A、索道B等）",
         "example" : null
       },
+      "CreateCallbackResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
+        }
+      },
       "CreateCallbackCertificateInfoList" : {
         "type" : "object",
         "properties" : {
@@ -5411,6 +5804,302 @@
         "properties" : {
           "extra" : { }
         }
+      },
+      "ReserveCodeBatchImportRequest" : {
+        "type" : "object",
+        "properties" : {
+          "account_id" : {
+            "type" : "string",
+            "description" : "商户ID",
+            "example" : null
+          },
+          "sku_id" : {
+            "type" : "string",
+            "description" : "商品ID",
+            "example" : null
+          },
+          "third_sku_id" : {
+            "type" : "string",
+            "description" : "三方商品ID",
+            "example" : null
+          },
+          "expired_time" : {
+            "type" : "integer",
+            "description" : "码过期秒时间戳",
+            "format" : "int32",
+            "example" : null
+          }
+        }
+      },
+      "ReserveCodeBatchImportResponse" : {
+        "type" : "object"
+      },
+      "ReserveCodeBindOrderInfoRequest" : {
+        "type" : "object",
+        "properties" : {
+          "account_id" : {
+            "type" : "string",
+            "description" : "商户ID",
+            "example" : null
+          },
+          "code" : {
+            "type" : "string",
+            "description" : "预置码",
+            "example" : null
+          },
+          "sku_id" : {
+            "type" : "string",
+            "description" : "该预置码适用的商品ID",
+            "example" : null
+          }
+        }
+      },
+      "ReserveCodeBindOrderInfoResponse" : {
+        "type" : "object"
+      },
+      "CalendarStaticAttrGroupSaveRequest" : {
+        "type" : "object",
+        "properties" : {
+          "calendar_static_attr_group" : {
+            "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveCalendarStaticAttrGroup"
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "商品所属商家ID",
+            "example" : null
+          }
+        }
+      },
+      "CalendarStaticAttrGroupSaveCalendarStaticAttrGroup" : {
+        "type" : "object",
+        "properties" : {
+          "product_out_id" : {
+            "type" : "string",
+            "description" : "关联的外部商品id，与product_id至少有一项必填",
+            "example" : null
+          },
+          "product_id" : {
+            "type" : "string",
+            "description" : "关联的商品Id，与product_out_id至少有一项必填",
+            "example" : null
+          },
+          "calendar_static_attrs" : {
+            "type" : "array",
+            "description" : "属性日历项",
+            "items" : {
+              "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveCalendarStaticAttrs"
+            },
+            "example" : null
+          }
+        },
+        "description" : "属性日历组",
+        "example" : null
+      },
+      "CalendarStaticAttrGroupSaveCalendarStaticAttrs" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "integer",
+            "description" : "DATE_RANGE = 1 // 日历范围类型WEEK_RANGE = 2 // 周范围类型DATE_VALUE = 3 // 具体的某几个日期类型WEEK_VALUE = 4 // 具体的周一到周日中某几天类型",
+            "format" : "int32",
+            "example" : null
+          },
+          "value" : {
+            "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveValue"
+          },
+          "attr_key_value_map" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "日历属性",
+            "example" : null
+          },
+          "status" : {
+            "type" : "integer",
+            "description" : "ONLINE = 1 // 在线DELETE = -1 // 删除",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "属性日历项",
+        "example" : null
+      },
+      "CalendarStaticAttrGroupSaveValue" : {
+        "type" : "object",
+        "properties" : {
+          "exclude_dates" : {
+            "type" : "array",
+            "description" : "日历中排除某些天,如[\"2022-04-01\",\"2022-03-05\",,\"2022-03-07\"]",
+            "items" : {
+              "type" : "object",
+              "properties" : { }
+            },
+            "example" : null
+          },
+          "values" : {
+            "type" : "array",
+            "description" : "CalendarType为周范围或具体周几（calendar_type=2或4)时，值为周一到周日中的范围或者某些天，如[\"1\",\"5\"]；CalendarType为日期的情况为日期范围或具体日期（calendar_type=1或3)时，值为日期范围或者具体的某些日期，如[\"2022-03-01\",\"2022-04-01\"]",
+            "items" : {
+              "type" : "object",
+              "properties" : { }
+            },
+            "example" : null
+          }
+        },
+        "description" : "日历值",
+        "example" : null
+      },
+      "CalendarStaticAttrGroupSaveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/CalendarStaticAttrGroupSaveData"
+          }
+        }
+      },
+      "CalendarStaticAttrGroupSaveData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误信息",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "返回数据",
+        "example" : null
+      },
+      "CalendarStockGroupSaveRequest" : {
+        "type" : "object",
+        "properties" : {
+          "calendar_stock_group" : {
+            "$ref" : "#/components/schemas/CalendarStockGroupSaveCalendarStockGroup"
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "商品所属商家ID",
+            "example" : null
+          }
+        }
+      },
+      "CalendarStockGroupSaveCalendarStockGroup" : {
+        "type" : "object",
+        "properties" : {
+          "product_out_id" : {
+            "type" : "string",
+            "description" : "关联的外部商品id，与product_id至少有一项必填",
+            "example" : null
+          },
+          "calendar_stocks" : {
+            "type" : "array",
+            "description" : "库存日历项",
+            "items" : {
+              "$ref" : "#/components/schemas/CalendarStockGroupSaveCalendarStocks"
+            },
+            "example" : null
+          },
+          "product_id" : {
+            "type" : "string",
+            "description" : "关联的商品Id，与product_out_id至少有一项必填",
+            "example" : null
+          }
+        },
+        "description" : "商品库存日历",
+        "example" : null
+      },
+      "CalendarStockGroupSaveCalendarStocks" : {
+        "type" : "object",
+        "properties" : {
+          "stock_qty_limit_type" : {
+            "type" : "integer",
+            "description" : "LIMITED = 1 // 有限库存UNLIMITED = 2 // 无限库存",
+            "format" : "int32",
+            "example" : null
+          },
+          "stock_qty" : {
+            "type" : "integer",
+            "description" : "总库存(可以为0)",
+            "format" : "int32",
+            "example" : null
+          },
+          "type" : {
+            "type" : "integer",
+            "description" : "DATE_RANGE = 1 // 日历范围类型WEEK_RANGE = 2 // 周范围类型DATE_VALUE = 3 // 具体的某几个日期类型WEEK_VALUE = 4 // 具体的周一到周日中某几天类型",
+            "format" : "int32",
+            "example" : null
+          },
+          "value" : {
+            "$ref" : "#/components/schemas/CalendarStockGroupSaveValue"
+          },
+          "status" : {
+            "type" : "integer",
+            "description" : "ONLINE = 1 // 在线DELETE = -1 // 删除",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "库存日历项",
+        "example" : null
+      },
+      "CalendarStockGroupSaveValue" : {
+        "type" : "object",
+        "properties" : {
+          "exclude_dates" : {
+            "type" : "array",
+            "description" : "日历中排除某些天,如[\"2022-04-01\",\"2022-03-05\",\"2022-03-07\"]",
+            "items" : {
+              "type" : "object",
+              "properties" : { }
+            },
+            "example" : null
+          },
+          "values" : {
+            "type" : "array",
+            "description" : "CalendarType为周范围或具体周几（calendar_type=2或4)时，值为周一到周日中的范围或者某些天，如[\"1\",\"5\"]；CalendarType为日期的情况为日期范围或具体日期（calendar_type=1或3)时，值为日期范围或者具体的某些日期，如[\"2022-03-01\",\"2022-04-01\"]",
+            "items" : {
+              "type" : "object",
+              "properties" : { }
+            },
+            "example" : null
+          }
+        },
+        "description" : "日历值",
+        "example" : null
+      },
+      "CalendarStockGroupSaveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : { },
+          "data" : {
+            "$ref" : "#/components/schemas/CalendarStockGroupSaveData"
+          }
+        }
+      },
+      "CalendarStockGroupSaveData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误信息",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "返回数据",
+        "example" : null
       },
       "CategoryGetRequest" : {
         "type" : "object",
@@ -6681,9 +7370,7 @@
       "ProductOperateResponse" : {
         "type" : "object",
         "properties" : {
-          "data" : {
-            "$ref" : "#/components/schemas/ProductOperateData"
-          },
+          "data" : { },
           "extra" : { }
         }
       },
@@ -7133,6 +7820,135 @@
         "description" : "响应信息",
         "example" : null
       },
+      "SpuSaveRequest" : {
+        "type" : "object",
+        "properties" : {
+          "account_id" : {
+            "type" : "string",
+            "description" : "商家ID；传入时服务商须与该商家满足授权关系，在开平应用详情的授权管理界面可以查看",
+            "example" : null
+          },
+          "spu" : {
+            "$ref" : "#/components/schemas/SpuSaveSpu"
+          }
+        }
+      },
+      "SpuSaveSpu" : {
+        "type" : "object",
+        "properties" : {
+          "product_type" : {
+            "type" : "integer",
+            "description" : "商品类型1:团购套餐 4:日历房 5:门票 7: 旅行跟拍 8:一日游 11:代金券 12:新预售 13:预定",
+            "format" : "int32",
+            "example" : null
+          },
+          "category_id" : {
+            "type" : "integer",
+            "description" : "商品类目，参考 商品类目表",
+            "format" : "int32",
+            "example" : null
+          },
+          "spu_name" : {
+            "type" : "string",
+            "description" : "标品名",
+            "example" : null
+          },
+          "out_spu_id" : {
+            "type" : "string",
+            "description" : "外部标品id",
+            "example" : null
+          },
+          "spu_status" : {
+            "type" : "integer",
+            "description" : "状态：* 1：使用* -1：禁用",
+            "format" : "int32",
+            "example" : null
+          },
+          "spu_id" : {
+            "type" : "string",
+            "description" : "标品Id，创建时不必填写，更新时如有out_spu_id可不填写",
+            "example" : null
+          },
+          "pois" : {
+            "type" : "array",
+            "description" : "店铺列表，目前酒旅只允许绑定一家poi_id与supplier_ext_id二选一即可",
+            "items" : {
+              "$ref" : "#/components/schemas/SpuSavePois"
+            },
+            "example" : null
+          },
+          "biz_line" : {
+            "type" : "integer",
+            "description" : "业务线：* 1：闭环自研开发者* 3：直连服务商* 5：小程序",
+            "format" : "int32",
+            "example" : null
+          },
+          "attr_key_value_map" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "商品属性KV，，详情见下面的字段或查询商品模板接口返回的字段",
+            "example" : null
+          },
+          "desc" : {
+            "type" : "string",
+            "description" : "描述",
+            "example" : null
+          }
+        },
+        "description" : "标品",
+        "example" : null
+      },
+      "SpuSavePois" : {
+        "type" : "object",
+        "properties" : {
+          "supplier_ext_id" : {
+            "type" : "string",
+            "description" : "接入方店铺id",
+            "example" : null
+          },
+          "poi_id" : {
+            "type" : "string",
+            "description" : "抖音POI_ID（即门店id）",
+            "example" : null
+          }
+        },
+        "description" : "店铺列表，目前酒旅只允许绑定一家poi_id与supplier_ext_id二选一即可",
+        "example" : null
+      },
+      "SpuSaveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/SpuSaveData"
+          }
+        }
+      },
+      "SpuSaveData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误信息",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码",
+            "format" : "int32",
+            "example" : null
+          },
+          "spu_id" : {
+            "type" : "string",
+            "description" : "创建/更新SPU成功后产生",
+            "example" : null
+          }
+        },
+        "description" : "返回数据",
+        "example" : null
+      },
       "StockSyncRequest" : {
         "type" : "object",
         "properties" : {
@@ -7179,7 +7995,9 @@
         "type" : "object",
         "properties" : {
           "data" : { },
-          "extra" : { }
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
         }
       },
       "StockSyncData" : {
@@ -8061,6 +8879,78 @@
             "$ref" : "#/components/schemas/extra"
           }
         }
+      },
+      "OrderCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "account_id" : {
+            "type" : "string",
+            "description" : "商家id（注意：并不是PoiID/门店id，请看右边截图-右上角为account_id）",
+            "example" : "7063315566466975788"
+          },
+          "cooperation_content" : {
+            "type" : "integer",
+            "description" : "合作类型。 5 表示代运营，当前只有 5",
+            "format" : "int32",
+            "example" : null
+          },
+          "start_time" : {
+            "type" : "integer",
+            "description" : "合作开始时间，精确到秒，不能选择过去的时间",
+            "format" : "int32",
+            "example" : 1671955800
+          },
+          "end_time" : {
+            "type" : "integer",
+            "description" : "合作结束时间，精确到秒，合作时间不得小于 3 个月",
+            "format" : "int32",
+            "example" : 1698221400
+          },
+          "charge_type" : {
+            "type" : "integer",
+            "description" : "收费类型：* 1：整体抽佣* 2：商品单独抽佣",
+            "format" : "int32",
+            "example" : 1
+          },
+          "commission_ratio" : {
+            "type" : "string",
+            "description" : "商品分佣比例，万分位（\"1234\"表示服务商分佣比例 12.34%）。注意：仅当整体抽佣需要传入该字段",
+            "example" : "1234"
+          }
+        }
+      },
+      "OrderCreateResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/OrderCreateData"
+          },
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
+        }
+      },
+      "OrderCreateData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误码描述",
+            "example" : "success"
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码，0为成功",
+            "format" : "int32",
+            "example" : 0
+          },
+          "order_id" : {
+            "type" : "string",
+            "description" : "订单id",
+            "example" : "7135354259311118380"
+          }
+        },
+        "example" : null
       },
       "OrderGetRequest" : {
         "type" : "object",
@@ -10995,6 +11885,9 @@
         "description" : "门店信息",
         "example" : null
       },
+      "BookGetResponse" : {
+        "type" : "object"
+      },
       "BuyMerchantConfirmOrderRequest" : {
         "type" : "object",
         "properties" : {
@@ -11244,7 +12137,7 @@
           },
           "ticket_specification" : {
             "type" : "array",
-            "description" : "日历票规格，单个商品多规格 查询非线上数据，不返回规格",
+            "description" : "日历票规格，单个商品多规格查询非线上数据，不返回规格",
             "items" : {
               "$ref" : "#/components/schemas/TicketQueryTicketSpecification"
             },
@@ -11353,8 +12246,8 @@
           },
           "status" : {
             "type" : "string",
-            "description" : "商品状态 上线、下线、审核中（当商品为审核中时，无需返回商品详情）",
-            "default" : "0 下线 1 已上线 2 审核中 3 审核失败",
+            "description" : "商品状态上线、下线、审核中（当商品为审核中时，无需返回商品详情）",
+            "default" : "0 下线1 已上线2 审核中3 审核失败",
             "example" : null
           }
         },
@@ -11401,7 +12294,7 @@
             "example" : null
           }
         },
-        "description" : "日历票规格，单个商品多规格 查询非线上数据，不返回规格",
+        "description" : "日历票规格，单个商品多规格查询非线上数据，不返回规格",
         "example" : null
       },
       "TicketQueryTicketSession" : {
@@ -11410,7 +12303,7 @@
           "ticket_session_time" : {
             "type" : "string",
             "description" : "场次时间，当有场次时选填该字段",
-            "default" : "8:00- -9:00 8:00-9:00",
+            "default" : "* 8:00-* -9:00* 8:00-9:00",
             "example" : null
           },
           "ticket_session_name" : {
@@ -11438,7 +12331,7 @@
               "type" : "integer",
               "format" : "int32"
             },
-            "default" : "1 身份证 2 券号 3 券码",
+            "default" : "1 身份证2 券号3 券码",
             "example" : null
           },
           "code_type" : {
@@ -11501,7 +12394,7 @@
           },
           "refund_fee" : {
             "type" : "integer",
-            "description" : "当退改规则类型为有条件退时，此字段必填，1.金额：fee=1000~10rmb，单位分 2.比例：100=1%",
+            "description" : "当退改规则类型为有条件退时，此字段必填，1.金额：fee=1000~10rmb，单位分2.比例：100=1%",
             "format" : "int32",
             "example" : null
           },
@@ -11550,7 +12443,7 @@
               "type" : "integer",
               "format" : "int32"
             },
-            "default" : "1 姓名 2 手机号 3 身份证",
+            "default" : "1 姓名2 手机号3 身份证",
             "example" : null
           }
         },
@@ -11684,7 +12577,7 @@
           },
           "buy_limit" : {
             "type" : "integer",
-            "description" : "限购规则 每笔订单最大限制购买X份 最多5份 （固定传0，抖音端默认一单最多5份）",
+            "description" : "限购规则 每笔订单最大限制购买X份 最多5份（固定传0，抖音端默认一单最多5份）",
             "format" : "int32"
           },
           "pre_order_time" : {
@@ -11697,7 +12590,7 @@
           },
           "ticket_type_id" : {
             "type" : "string",
-            "description" : "票种id，对应M-Spu，抖音侧下发id，创建时不传 同一个票种(ticket_type_id或ticket_type_out_id相同认为是同一个票种)最多被15个product绑定 C端票种展示顺序，按照创建的先后顺序展示",
+            "description" : "票种id，对应M-Spu，抖音侧下发id，创建时不传同一个票种(ticket_type_id或ticket_type_out_id相同认为是同一个票种)最多被15个product绑定C端票种展示顺序，按照创建的先后顺序展示",
             "example" : null
           },
           "category_id" : {
@@ -11728,7 +12621,7 @@
           },
           "ticket_type_name" : {
             "type" : "string",
-            "description" : "票种名称 票种名称为一类票的聚合，请根据商家经营情况设定。可以为大门票、交通票、项目票等 需要注意的是如果传ticket_type_out_id或ticket_type_id二者其一，更新的时候会影响其他所有用到相同id的日历票",
+            "description" : "票种名称票种名称为一类票的聚合，请根据商家经营情况设定。可以为大门票、交通票、项目票等需要注意的是如果传ticket_type_out_id或ticket_type_id二者其一，更新的时候会影响其他所有用到相同id的日历票",
             "example" : null
           },
           "is_test_data" : {
@@ -11745,7 +12638,7 @@
           },
           "poi_ids" : {
             "type" : "array",
-            "description" : "抖音POI_ID（即门店id，可以多个） 注：本期只支持一个POI 同一个poi下票种的名称不能重复 同一个poi下最多绑定10个日历票的票种",
+            "description" : "抖音POI_ID（即门店id，可以多个）注：本期只支持一个POI同一个poi下票种的名称不能重复同一个poi下最多绑定10个日历票的票种",
             "items" : {
               "type" : "string"
             },
@@ -11778,32 +12671,32 @@
           "refund_details" : {
             "type" : "array",
             "description" : "当退改规则类型为有条件退时，此字段必填，可以多个时段阶梯组合",
-            "example" : "注1. 除有条件退外，其他类型不要传此字段 注2. 当退款时间为负，对应时间未使用后，自动核销",
+            "example" : "注1. 除有条件退外，其他类型不要传此字段注2. 当退款时间为负，对应时间未使用后，自动核销",
             "items" : {
               "$ref" : "#/components/schemas/TicketSaveRefundDetails"
             }
           },
           "auto_refund_time" : {
             "type" : "integer",
-            "description" : "自动退款时间，单位秒； 从离园日24点往后计算，到达时间点后系统执行自动退款，退款节点按小时执行； 若选择未使用随时退，此字段生效，表示系统自动退款（如果只填写auto_refund_time，refund_type不是1，则该字段不生效）； 若选择未用随时退，未填写该字段，则表示离园日24点自动退款",
+            "description" : "自动退款时间，单位秒；从离园日24点往后计算，到达时间点后系统执行自动退款，退款节点按小时执行；若选择未使用随时退，此字段生效，表示系统自动退款（如果只填写auto_refund_time，refund_type不是1，则该字段不生效）；若选择未用随时退，未填写该字段，则表示离园日24点自动退款",
             "format" : "int32",
             "example" : null
           }
         },
         "description" : "退改规则",
-        "example" : "\"refund_rule\": {\n    \"refund_type\": 3, // 有条件退\n    \"refund_details\":[{\n        \"refund_time\": 86400, // 提前一天\n        \"refund_fee_type\": 2, // 百分比\n        \"refund_fee\": 5000 // 50%\n    }]\n}\n// 该示例表示在游玩前1天24:00之前，可以退款50%，在之后不可退\n// eg. 用户预约5.3日的门票，5.2晚24点前退收50%手续费，5.3日0点后不可退"
+        "example" : "```Plain Text[\"refund_rule\": { \"refund_type\": 3, // 有条件退 \"refund_details\":[{ \"refund_time\": 86400, // 提前一天 \"refund_fee_type\": 2, // 百分比 \"refund_fee\": 5000 // 50% }]}// 该示例表示在游玩前1天24:00之前，可以退款50%，在之后不可退// eg. 用户预约5.3日的门票，5.2晚24点前退收50%手续费，5.3日0点后不可退]```"
       },
       "TicketSaveRefundDetails" : {
         "type" : "object",
         "properties" : {
           "refund_time" : {
             "type" : "integer",
-            "description" : "当退改规则类型为有条件退时，此字段必填，单位秒 有条件退支持配置使用日期后的配置",
+            "description" : "当退改规则类型为有条件退时，此字段必填，单位秒有条件退支持配置使用日期后的配置",
             "format" : "int32"
           },
           "refund_fee" : {
             "type" : "integer",
-            "description" : "当退改规则类型为有条件退时，此字段必填 金额：fee=1000等价于10rmb，单位分 比例：fee=100等价于 1%， 万分位 注意：退款金额应小于成交金额（比例应小于100%），否则订单将不可退",
+            "description" : "当退改规则类型为有条件退时，此字段必填* 金额：fee=1000等价于10rmb，单位分* 比例：fee=100等价于 1%， 万分位注意：退款金额应小于成交金额（比例应小于100%），否则订单将不可退",
             "format" : "int32",
             "example" : null
           },
@@ -11814,7 +12707,7 @@
           }
         },
         "description" : "当退改规则类型为有条件退时，此字段必填，可以多个时段阶梯组合",
-        "example" : "注1. 除有条件退外，其他类型不要传此字段 注2. 当退款时间为负，对应时间未使用后，自动核销"
+        "example" : "注1. 除有条件退外，其他类型不要传此字段注2. 当退款时间为负，对应时间未使用后，自动核销"
       },
       "TicketSaveTicketRule" : {
         "type" : "object",
@@ -11826,8 +12719,8 @@
           },
           "code_sending_info" : {
             "type" : "array",
-            "description" : "凭证发放方式，多选 （建议全部写入list，凭证回调时，如果有额外类型的凭证会报错）",
-            "example" : "1 身份证 2 券号 3 券码",
+            "description" : "凭证发放方式，多选（建议全部写入list，凭证回调时，如果有额外类型的凭证会报错）",
+            "example" : "1 身份证2 券号3 券码",
             "items" : {
               "type" : "integer",
               "format" : "int32"
@@ -11835,7 +12728,7 @@
           },
           "code_type" : {
             "type" : "integer",
-            "description" : "券码类型，当凭证方式为券码时，此字段必填 日历票必填code_type = 2",
+            "description" : "券码类型，当凭证方式为券码时，此字段必填日历票必填code_type = 2",
             "format" : "int32"
           }
         },
@@ -11847,12 +12740,12 @@
         "properties" : {
           "earliest_time" : {
             "type" : "integer",
-            "description" : "当前景区门票最早入园时间 单位秒 如果传0 为0点钟 必须小于86400（24小时）",
+            "description" : "当前景区门票最早入园时间 单位秒如果传0 为0点钟必须小于86400（24小时）",
             "format" : "int32"
           },
           "latest_time" : {
             "type" : "integer",
-            "description" : "当前景区门票最晚入园时间 单位秒 必须小于等于86400（24小时）",
+            "description" : "当前景区门票最晚入园时间 单位秒必须小于等于86400（24小时）",
             "format" : "int32",
             "example" : null
           }
@@ -11884,13 +12777,13 @@
         "properties" : {
           "enter_time" : {
             "type" : "integer",
-            "description" : "预定后最早入园时间 从预定时间向后计算 单位秒 （本期默认为0 购买后可以立刻生效）",
+            "description" : "预定后最早入园时间 从预定时间向后计算 单位秒（本期默认为0 购买后可以立刻生效）",
             "format" : "int32",
             "example" : null
           },
           "pre_time" : {
             "type" : "integer",
-            "description" : "最晚预定时间 以日历票入园当天24点向前计算 单位秒 目前支持传值[0,86400] 86400 -> 需提前1天下单购买",
+            "description" : "最晚预定时间 以日历票入园当天24点向前计算 单位秒 目前支持传值[0,86400]86400 -> 需提前1天下单购买",
             "format" : "int32"
           }
         },
@@ -11920,7 +12813,7 @@
           },
           "sku_name" : {
             "type" : "string",
-            "description" : "日历票规格，SKU名称 （推荐填写：POI名称+票种名称+人群+规格枚举名称）",
+            "description" : "日历票规格，SKU名称（推荐填写：POI名称+票种名称+人群+规格枚举名称）",
             "example" : null
           },
           "sku_out_id" : {
@@ -11938,7 +12831,7 @@
           "ticket_session_time" : {
             "type" : "string",
             "description" : "场次时间，当有场次时选填该字段",
-            "example" : "8:00- -9:00 8:00-9:00"
+            "example" : "* 8:00-* -9:00* 8:00-9:00"
           },
           "ticket_session_name" : {
             "type" : "string",
@@ -11960,7 +12853,7 @@
           "reserved_rules" : {
             "type" : "array",
             "description" : "游玩人留资信息要求，可多选",
-            "example" : "1 姓名 2 手机号 3 身份证",
+            "example" : "1 姓名2 手机号3 身份证",
             "items" : {
               "type" : "integer",
               "format" : "int32"
@@ -12074,7 +12967,7 @@
           },
           "status" : {
             "type" : "integer",
-            "description" : "上线、下线 当操作为下线时，价格库存非必填 库存和价格必填",
+            "description" : "上线、下线当操作为下线时，价格库存非必填 库存和价格必填",
             "format" : "int32",
             "example" : null
           }
