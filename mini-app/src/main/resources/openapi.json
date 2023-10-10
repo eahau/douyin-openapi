@@ -403,11 +403,23 @@
     "/api/apps/ecpay/saas/add_merchant" : {
       "post" : {
         "tags" : [ "ecpay" ],
-        "description" : "[服务商获取服务商进件页面](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/ecpay/page-links/apply/merchant)",
+        "description" : "[服务商获取服务商提现页面](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/ecpay/page-links/withdraw/merchant)",
         "operationId" : "postApiAppsEcpaySaasAddMerchant",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "固定值 \"application/json\"",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "固定值 \"application/json\"",
+            "default" : "application/json",
+            "example" : null
+          }
+        } ],
         "responses" : {
           "default" : {
-            "description" : "服务商获取服务商进件页面",
+            "description" : "服务商获取服务商提现页面",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2350,30 +2362,8 @@
     "/api/apps/trade/v2/fulfillment/delivery_prepare" : {
       "post" : {
         "tags" : [ "trade-system" ],
-        "description" : "[验券准备](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/fulfillment/douyin-code/delivery-prepare)",
+        "description" : "[验券准备](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/self-operated-trading/write-off/douyin-code/delivery-preparation)",
         "operationId" : "postApiAppsTradeV2FulfillmentDeliveryPrepare",
-        "parameters" : [ {
-          "name" : "Content-Type",
-          "in" : "header",
-          "description" : "固定值 \"application/json\"",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "固定值 \"application/json\"",
-            "default" : "application/json",
-            "example" : null
-          }
-        }, {
-          "name" : "access-token",
-          "in" : "header",
-          "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-            "example" : null
-          }
-        } ],
         "responses" : {
           "default" : {
             "description" : "验券准备",
@@ -2384,10 +2374,10 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "{\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"verify_token\": \"xxx\",\n    \"out_order_no\": \"out123456\",\n    \"order_id\": \"ot123456\",\n    \"certificates\": [\n      {\n        \"encrypted_code\": \"xxx\",\n        \"certificate_id\": \"123456\",\n        \"item_order_id\": \"ot123\"\n      }\n    ]\n  },\n  \"extra\": {\n    \"sub_error_code\": 0,\n    \"sub_description\": \"success\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 0,\n    \"description\": \"success\"\n  }\n}\n"
+                    "value" : "[{\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"verify_token\": \"xxx\",\n    \"out_order_no\": \"out123456\",\n    \"order_id\": \"ot123456\",\n    \"certificates\": [\n      {\n        \"encrypted_code\": \"xxx\",\n        \"certificate_id\": \"123456\",\n        \"item_order_id\": \"ot123\"\n      }\n    ]\n  },\n  \"extra\": {\n    \"sub_error_code\": 0,\n    \"sub_description\": \"success\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 0,\n    \"description\": \"success\"\n  } \n}\n]\n"
                   },
                   "failed" : {
-                    "value" : "{\n  \"data\": {\n    \"error_code\": 2190004,\n    \"description\": \"应用未获得该能力, 请去https://open.douyin.com/申请\"\n  },\n  \"extra\": {\n    \"sub_error_code\": 0,\n    \"sub_description\": \"\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 2190004,\n    \"description\": \"应用未获得该能力, 请去https://open.douyin.com/申请\"\n  }\n}\n"
+                    "value" : "[{\n  \"data\": {\n    \"error_code\": 2190004,\n    \"description\": \"应用未获得该能力, 请去https://open.douyin.com/申请\"\n  },\n  \"extra\": {\n    \"sub_error_code\": 0,\n    \"sub_description\": \"\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686, \n    \"error_code\": 2190004,\n    \"description\": \"应用未获得该能力, 请去https://open.douyin.com/申请\"\n  }\n}\n]\n"
                   }
                 }
               }
@@ -2630,7 +2620,7 @@
     "/api/apps/trade/v2/order/query_order" : {
       "post" : {
         "tags" : [ "trade-system" ],
-        "description" : "[查询订单信息](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/self-operated-trading/query-info/query-order)",
+        "description" : "[查询订单信息](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/query-info/query-order)",
         "operationId" : "postApiAppsTradeV2OrderQueryOrder",
         "responses" : {
           "default" : {
@@ -2955,33 +2945,11 @@
     "/api/apps/trade/v2/refund/create_refund" : {
       "post" : {
         "tags" : [ "trade-system" ],
-        "description" : "[开发者发起退款](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/refund/apply)",
+        "description" : "[发起退款](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/self-operated-trading/refund/init-refund)",
         "operationId" : "postApiAppsTradeV2RefundCreateRefund",
-        "parameters" : [ {
-          "name" : "Content-Type",
-          "in" : "header",
-          "description" : "固定值 \"application/json\"",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "固定值 \"application/json\"",
-            "default" : "application/json",
-            "example" : null
-          }
-        }, {
-          "name" : "access-token",
-          "in" : "header",
-          "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-            "example" : null
-          }
-        } ],
         "responses" : {
           "default" : {
-            "description" : "开发者发起退款",
+            "description" : "发起退款",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2989,10 +2957,10 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"refund_id\": \"ot12312312\"\n  },\n  \"extra\": {\n    \"sub_error_code\": 0,\n    \"sub_description\": \"success\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 0,\n    \"description\": \"success\"\n  }\n}\n]\n"
+                    "value" : "[{\n  \"data\": {\n    \"error_code\": 13000,\n    \"description\": \"系统错误\"\n  },\n  \"extra\": {\n    \"sub_error_code\": 13000,\n    \"sub_description\": \"系统错误\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 2191000,\n    \"description\": \"\" \n  }\n]\n"
                   },
                   "failed" : {
-                    "value" : "[{\n  \"data\": {\n    \"error_code\": 13000,\n    \"description\": \"系统错误\"\n  },\n  \"extra\": {\n    \"sub_error_code\": 13000,\n    \"sub_description\": \"系统错误\",\n    \"logid\": \"2022092115392201020812109511046\",\n    \"now\": 1663745962686,\n    \"error_code\": 2191000,\n    \"description\": \"\"\n  }\n}\n]\n"
+                    "value" : null
                   }
                 }
               }
@@ -3004,30 +2972,8 @@
     "/api/apps/trade/v2/refund/merchant_audit_callback" : {
       "post" : {
         "tags" : [ "trade-system" ],
-        "description" : "[同步退款审核结果](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/refund/audit-callback)",
+        "description" : "[同步退款审核结果](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/self-operated-trading/refund/audit-callback)",
         "operationId" : "postApiAppsTradeV2RefundMerchantAuditCallback",
-        "parameters" : [ {
-          "name" : "Content-Type",
-          "in" : "header",
-          "description" : "固定值 \"application/json\"",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "固定值 \"application/json\"",
-            "default" : "application/json",
-            "example" : null
-          }
-        }, {
-          "name" : "access-token",
-          "in" : "header",
-          "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "description" : "调用/oauth/client_token/生成的token，此token不需要用户授权。",
-            "example" : null
-          }
-        } ],
         "responses" : {
           "default" : {
             "description" : "同步退款审核结果",
@@ -3801,8 +3747,8 @@
     },
     "/api/apps/v1/capacity/apply_capacity" : {
       "post" : {
-        "tags" : [ "live-capcity" ],
-        "description" : "[申请跳转抖音直播间能力](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/live-capcity/apply-jump-live-room)",
+        "tags" : [ "page-layout-custom" ],
+        "description" : "[申请页面结构自定义能力](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/page-layout-custom/apply-capacity)",
         "operationId" : "postApiAppsV1CapacityApplyCapacity",
         "parameters" : [ {
           "name" : "Content-Type",
@@ -3839,7 +3785,7 @@
         },
         "responses" : {
           "default" : {
-            "description" : "申请跳转抖音直播间能力",
+            "description" : "申请页面结构自定义能力",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5239,17 +5185,17 @@
     },
     "/api/apps/v1/capacity/query_apply_status" : {
       "get" : {
-        "tags" : [ "live-capcity" ],
-        "description" : "[查询直播间状态组件能力申请状态](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/live-capcity/query-live-room-status-capacity)",
+        "tags" : [ "page-layout-custom" ],
+        "description" : "[查询页面结构自定义能力申请状态](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/page-layout-custom/query-capacity-status)",
         "operationId" : "getApiAppsV1CapacityQueryApplyStatus",
         "parameters" : [ {
           "name" : "capacity_key",
           "in" : "query",
-          "description" : "固定值“ma.jsapi.live_room_status”",
+          "description" : "固定值“ma.component.page_layout_custom”",
           "required" : true,
           "schema" : {
             "type" : "number",
-            "description" : "固定值“ma.jsapi.live_room_status”",
+            "description" : "固定值“ma.component.page_layout_custom”",
             "format" : "double",
             "example" : null
           }
@@ -5266,7 +5212,7 @@
         } ],
         "responses" : {
           "default" : {
-            "description" : "查询直播间状态组件能力申请状态",
+            "description" : "查询页面结构自定义能力申请状态",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -7295,29 +7241,17 @@
     "/api/apps/v1/data_analysis/query_live_deal_data" : {
       "get" : {
         "tags" : [ "data-analysis" ],
-        "description" : "[直播间总览数据](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/data-analysis/live-analysis/room-overview-analysis)",
+        "description" : "[直播交易分析](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/data-analysis/transaction-analysis/live-deal-analysis)",
         "operationId" : "getApiAppsV1DataAnalysisQueryLiveDealData",
         "parameters" : [ {
           "name" : "live_room_id",
           "in" : "query",
-          "description" : "直播间id",
+          "description" : "直播间ID，可通过【获取直播房间数据】接口获取",
           "required" : true,
           "schema" : {
             "type" : "number",
-            "description" : "直播间id",
+            "description" : "直播间ID，可通过【获取直播房间数据】接口获取",
             "format" : "double",
-            "example" : null
-          }
-        }, {
-          "name" : "query_bind_type",
-          "in" : "query",
-          "description" : "查询数据的挂载类型，1-自挂载数据，0-自挂载数据+达人挂载数据，4-自挂载数据+达人挂载数据+通用挂载数据，调用此open_api，参数必须传0或1或4，传空可能查出非预期的数据",
-          "required" : false,
-          "schema" : {
-            "type" : "number",
-            "description" : "查询数据的挂载类型，1-自挂载数据，0-自挂载数据+达人挂载数据，4-自挂载数据+达人挂载数据+通用挂载数据，调用此open_api，参数必须传0或1或4，传空可能查出非预期的数据",
-            "format" : "double",
-            "default" : 1.0,
             "example" : null
           }
         }, {
@@ -7333,7 +7267,7 @@
         } ],
         "responses" : {
           "default" : {
-            "description" : "直播间总览数据",
+            "description" : "直播交易分析",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -7341,10 +7275,10 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n    \"err_no\": 0,\n    \"err_msg\": \"success\",\n    \"data\": {\n      //一段日期范围内产生的总览数据\n      \"deal_overview_data\": {\n        \"show_count\": 5026,        //小程序曝光次数\n        \"click_count\": 25,         //小程序点击次数\n        \"create_order_count\": 0,   //创建订单数\n        \"pay_order_count\": 0,      //支付订单数\n        \"create_order_amount\":0,   //创建订单金额(单位：分)\n        \"pay_order_amount\":0,      //支付订单金额(单位：分)\n        \"create_user_count\":0,     //创建订单人数\n        \"success_user_cnt\":0,      //支付订单人数\n        \"sale_product_cnt\":0,      //动销商品数(支付订单中，涉及的交易商品的数量)\n        \"customer_once_price\":0,         //客单价(支付订单金额/支付订单人数 (单位：分))\n        \"order_once_price\":0,            //单均价(支付订单金额/支付订单数 (单位：分))\n        \"refund_user_cnt\":0,             //发起退款人数\n        \"refund_order_cnt\":0,            //发起退款订单数\n        \"refund_order_amount\":0,         //发起退款金额(单位：分)\n        \"refund_success_user_cnt\":0,     //退款成功用户数\n        \"refund_success_order_cnt\":0,    //退款成功订单数\n        \"refund_success_order_amount\":0 //退款成功订单金额(单位：分)\n      },\n      //对应日期产生的数据\n      \"deal_data_list\": [\n        {\n          \"time\": \"2023-03-20 00:00:00\",  //日期\n          \"show_count\": 5026,        //小程序曝光次数\n          \"click_count\": 25,         //小程序点击次数\n          \"create_order_count\": 0,   //创建订单数\n          \"pay_order_count\": 0,      //支付订单数\n          \"create_order_amount\":0,   //创建订单金额(单位：分)\n          \"pay_order_amount\":0,      //支付订单金额(单位：分)\n          \"create_user_count\":0,     //创建订单人数\n          \"success_user_cnt\":0,      //支付订单人数\n          \"sale_product_cnt\":0,      //动销商品数(支付订单中，涉及的交易商品的数量)\n          \"customer_once_price\":0,         //客单价(支付订单金额/支付订单人数 (单位：分))\n          \"order_once_price\":0,            //单均价(支付订单金额/支付订单数 (单位：分))\n          \"refund_user_cnt\":0,             //发起退款人数\n          \"refund_order_cnt\":0,            //发起退款订单数\n          \"refund_order_amount\":0,         //发起退款金额(单位：分)\n          \"refund_success_user_cnt\":0,     //退款成功用户数\n          \"refund_success_order_cnt\":0,    //退款成功订单数\n          \"refund_success_order_amount\":0  //退款成功订单金额(单位：分)\n        },\n        {\n          \"time\": \"2023-03-21 00:00:00\",  //日期\n          \"show_count\": 5026,        //小程序曝光次数\n          \"click_count\": 25,         //小程序点击次数\n          \"create_order_count\": 0,   //创建订单数\n          \"pay_order_count\": 0,      //支付订单数\n          \"create_order_amount\":0,   //创建订单金额(单位：分)\n          \"pay_order_amount\":0,      //支付订单金额(单位：分)\n          \"create_user_count\":0,     //创建订单人数\n          \"success_user_cnt\":0,      //支付订单人数\n          \"sale_product_cnt\":0,      //动销商品数(支付订单中，涉及的交易商品的数量)\n          \"customer_once_price\":0,         //客单价(支付订单金额/支付订单人数 (单位：分))\n          \"order_once_price\":0,            //单均价(支付订单金额/支付订单数 (单位：分))\n          \"refund_user_cnt\":0,             //发起退款人数\n          \"refund_order_cnt\":0,            //发起退款订单数\n          \"refund_order_amount\":0,         //发起退款金额(单位：分)\n          \"refund_success_user_cnt\":0,     //退款成功用户数\n          \"refund_success_order_cnt\":0,    //退款成功订单数\n          \"refund_success_order_amount\":0  //退款成功订单金额(单位：分)\n        }\n      ]\n    },\n    \"log_id\":xxx\n}\n]\n"
+                    "value" : "{\n  \"err_no\": 0,\n  \"err_msg\": \"success\",\n  \"data\": {\n    \"deal_overview_data\": {\n      \"create_order_count\": 10,\n      \"pay_order_count\": 5,\n      \"create_order_amount\": 10000,\n      \"pay_order_amount\": 50000,\n      \"click_count\": 100,\n      \"show_count\": 1000,\n      \"success_user_cnt\": 5,\n      \"refund_order_cnt\": 0,\n      \"sale_product_cnt\": 5\n    },\n    \"deal_data_list\": [\n      {\n        \"time\": \"2022-12-27 15:04:05\",\n        \"create_order_count\": 10,\n        \"pay_order_count\": 5,\n        \"create_order_amount\": 10000,\n        \"pay_order_amount\": 50000,\n        \"click_count\": 100,\n        \"show_count\": 1000,\n        \"success_user_cnt\": 5,\n        \"refund_order_cnt\": 0,\n        \"sale_product_cnt\": 5\n      }\n    ]\n  }\n}\n"
                   },
                   "failed" : {
-                    "value" : "[{\n    \"err_no\":11009,\n    \"err_msg\":参数不合法或缺少参数,\n    \"log_id\":xxx,\n    \"data\":{\n    }\n}\n]\n"
+                    "value" : "{\n  \"err_no\": -1,\n  \"err_msg\": \"系统错误\"\n}\n"
                   }
                 }
               }
@@ -7960,7 +7894,7 @@
     "/api/apps/v1/data_analysis/query_short_live_data_with_id" : {
       "post" : {
         "tags" : [ "data-analysis" ],
-        "description" : "[直播间详细数据](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/data-analysis/live-analysis/room-detail-analysis)",
+        "description" : "[短视频详细数据](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/data-analysis/video-analysis/video-detail-analysis)",
         "operationId" : "postApiAppsV1DataAnalysisQueryShortLiveDataWithId",
         "parameters" : [ {
           "name" : "access-token",
@@ -7975,7 +7909,7 @@
         } ],
         "responses" : {
           "default" : {
-            "description" : "直播间详细数据",
+            "description" : "短视频详细数据",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -7983,10 +7917,10 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n  \"err_no\":0,\n  \"err_msg\":\"success\",\n  \"data\":{\n    // 短视频/直播间详细数据列表,每一个元素表示一个短视频/直播间数据，列表按短视频发布时间/直播间开播时间倒序排列\n    \"data_list\":[\n      {\n        //如果是直播间，则会返回如下指标\n        \"room_id\": \"7169582199207939932\", //直播间ID\n        \"app_type\": \"1128\",               //开播平台,-1-不区分端，1128-抖音, 8663-火山,1112-火山（旧）,2329-抖音lite, 1350-火山lite, 13-头条，35-头条lite\n        \"room_aweme_shortid\":\"今天又明天\",  //直播间作者对应的抖音号\n        \"room_aweme_type\":\"1\",            //直播间作者对应的类型，1:企业号 0或者没有该字段表示个人号\n        \"room_aweme_nickname\":\"xxx\",      //直播间作者的昵称\n        \"room_aweme_avt\":\"xxx\",           //直播间作者头像地址\n        \"room_duration\":\"449\",            //开播时长，单位秒\n        \"room_create_time\":\"1679241689\",  //直播间开播时间，时间戳形式\n        \"room_finish_time\":\"1679241989\",  //直播间关播时间，时间戳形式\n        \"room_highest_online_count\":\"1\",  //直播间最高在线人数\n        \"room_once_watch_duration\":\"10\",    //直播间人均观看时长（单位：秒）,计算方式=直播间观看总时长/直播间观看人数\n        \"room_comment_count\":\"1\",           //直播间评论次数\n        \"room_like_count\":\"1\",              //直播间点赞次数\n        \"room_share_count\":\"1\",             //直播间分享次数\n        \"room_comment_user_count\":\"1\",      //直播间评论人数\n        \"room_like_user_count\":\"1\",         //直播间点赞人数\n        \"room_share_user_count\":\"1\",        //直播间分享人数\n\n        \"mp_show_pv\":\"2\",                   //小程序曝光次数\n        \"mp_click_pv\":\"2\",                  //小程序点击次数（该指标后续不再提供，可以参考 mp_drainage_pv 指标）\n        \"mp_drainage_pv\":\"2\",               //进入小程序次数\n        \"mp_show_uv\":\"2\",                   //小程序曝光人数\n        \"mp_click_uv\":\"2\",                  //小程序点击人数（该指标后续不再提供，可以参考 mp_drainage_uv 指标）\n        \"mp_drainage_uv\":\"2\",               //进入小程序人数\n\n        \"room_show_pv\":\"3\",                 //直播间曝光次数\n        \"room_show_uv\":\"3\",                 //直播间曝光人数\n        \"room_watch_pv\":\"3\",                //直播间看播次数\n        \"room_watch_uv\":\"3\",                //直播间看播人数\n        \"room_watch_rate\":\"100%\",           //看播率(直播间看播人数/直播间曝光人数)\n        \"room_interactive_rate\":\"0%\",       //互动率，此指标计算方式不完善，暂不使用该指标\n        \"room_uv_price\":\"0\",                //直播间uv价值(单位：分) 计算方式-(支付订单金额/小程序曝光人数)\n        \"mp_click_rate\":\"100%\",             //小程序点击率 计算方式-(小程序点击人数/小程序曝光人数)\n        \"pay_order_cnt\":\"1\",                //支付订单数\n        \"pay_customer_cnt\":\"1\",             //支付订单人数\n        \"pay_order_amount\":\"1\",             //支付订单金额(单位：分)\n        \"customer_once_price\":\"1\",          //客单价(支付订单金额/支付订单人数 单位：分)\n        \"order_once_price\":\"1\",             //单均价(支付订单金额/支付订单数 单位：分)\n        \"refund_customer_cnt\":\"0\",          //发起退款用户数\n        \"refund_order_cnt\":\"0\",             //发起退款订单数\n        \"refund_amount\":\"0\"                 //发起退款金额(单位：分)\n        \"bc_relation_bind_type\":\"0\"         //BC账号绑定关系，0-普通号，100-品牌号，200-员工号，300-合作号\n      },\n      {\n        ...\n      },\n      {\n        ...\n      }\n      ,\n      ...\n    ],\n    \"sum\":20, //在查询条件范围内发布视频/直播间的总数\n\n    // 此字段只有在查询单个直播间时才有数据返回，用于展示跨天直播的直播间在每一天所产生的详细数据，key:时间戳，value:直播间数据\n    \"detail_data\":{\n        1679241600:{\n        //与data_list列表中的元素的字段相同\n        ...\n        },\n        1679328000:{\n        ...\n        }\n        }\n  },\n  \"log_id\":xxx\n}\n]\n"
+                    "value" : "[{\n  \"err_no\":0,\n  \"err_msg\":\"success\",\n  \"data\":{\n    // 短视频/直播间详细数据列表,每一个元素表示一个短视频/直播间数据，列表按短视频发布时间/直播间开播时间倒序排列\n    \"data_list\":[\n      {\n        //如果是短视频，则会返回如下指标\n        \"item_id\": \"7169582199207939932\", //短视频ID\n        \"item_title\": \"无敌战神\",          //短视频标题\n        \"item_cover\": \"xxx\",              //短视频封面（目前只有抖音端发布的短视频才有封面地址）\n        \"item_addr\": \"xxx\",               //短视频播放地址（目前只有抖音端发布的短视频才有播放地址）\n        \"item_aweme_shortid\":\"今天又明天\",  //短视频作者对应的抖音号\n        \"item_aweme_type\":\"1\",            //短视频作者对应的类型，1:企业号 0:个人号\n        \"item_aweme_name\":\"xxx\",          //短视频作者的昵称\n        \"item_aweme_avatar\":\"xxx\",        //短视频作者头像地址\n        \"item_duration\":\"449\",            //短视频时长，单位秒\n        \"item_create_time\":\"1679241689\",  //短视频创建时间，时间戳形式\n        \"item_last_frame_watch_cnt\":2,    //短视频最后一帧观看完成次数\n        \"item_completion_rate\":\"10%\",     //短视频完播率(短视频最后一帧观看完成次数/短视频播放次数)\n        \"item_comment_count\":\"1\",         //短视频评论次数\n        \"item_like_count\":\"1\",            //短视频点赞次数\n        \"item_share_count\":\"1\",           //短视频分享次数\n        \"item_vv\":\"20\",                   //短视频播放次数\n        \"mp_show_pv\":\"2\",                 //小程序曝光次数\n        \"mp_click_pv\":\"2\",                //小程序点击次数（该指标后续不再提供，可以参考 mp_drainage_pv 指标）\n        \"mp_drainage_pv\":\"2\",             //进入小程序次数\n        \"item_uv\":\"20\",                   //短视频播放人数\n        \"mp_show_uv\":\"2\",                 //小程序曝光人数\n        \"mp_click_uv\":\"2\",                //小程序点击人数（该指标后续不再提供，可以参考 mp_drainage_uv 指标）\n        \"mp_drainage_uv\":\"2\",             //进入小程序人数\n        \"pay_order_cnt\":\"1\",              //支付订单数\n        \"pay_customer_cnt\":\"1\",           //支付订单人数\n        \"pay_order_amount\":\"1\",           //支付订单金额(单位：分)\n        \"customer_once_price\":\"1\",        //客单价(支付订单金额/支付订单人数 单位：分)\n        \"order_once_price\":\"1\",           //单均价(支付订单金额/支付订单数 单位：分)\n        \"refund_customer_cnt\":\"0\",        //发起退款用户数\n        \"refund_order_cnt\":\"0\",           //发起退款订单数\n        \"refund_amount\":\"0\"               //发起退款金额(单位：分)\n        \"bc_relation_bind_type\":\"0\"       //BC账号绑定关系，0-普通号，100-品牌号，200-员工号，300-合作号\n      },\n      {\n        ...\n      },\n      {\n        ...\n      }\n      ,\n      ...\n    ],\n    \"sum\":20, //在查询条件范围内发布视频/直播间的总数\n\n    // 此字段只有在查询单个直播间时才有数据返回，用于展示跨天直播的直播间在每一天所产生的详细数据，key:每天整点时间戳，value:直播间数据\n    \"detail_data\":{\n      1679241600:{\n        //与data_list列表中的元素的字段相同\n        ...\n      },\n      1679328000:{\n        ...\n      }\n    }\n  },\n  \"log_id\":xxx\n}\n]\n"
                   },
                   "failed" : {
-                    "value" : "[{\n    \"err_no\":11009,\n    \"err_msg\":参数不合法或缺少参数,\n    \"log_id\":xxx,\n    \"data\":{\n  }\n}\n]\n"
+                    "value" : "[{\n  \"err_no\":11009,\n  \"err_msg\":参数不合法或缺少参数,\n  \"log_id\":xxx,\n  \"data\":{\n  }\n}\n]\n"
                   }
                 }
               }
@@ -9793,33 +9727,41 @@
     "/api/ecom/v1/config/register_ma_app/" : {
       "post" : {
         "tags" : [ "e-commerce" ],
-        "description" : "[定制类小程序开发者注册信息](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/e-commerce/customGoodsAPPregister)",
+        "description" : "[注册小程序预览图](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/e-commerce/registermicroappcoverfigure)",
         "operationId" : "postApiEcomV1ConfigRegisterMaApp",
         "parameters" : [ {
           "name" : "content-type",
           "in" : "header",
-          "description" : "固定值 \"application/json\"",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "固定值 \"application/json\"",
-            "default" : "application/json",
-            "example" : null
-          }
+            "example" : "\"application/json\""
+          },
+          "example" : "\"application/json\""
         }, {
           "name" : "access-token",
           "in" : "header",
-          "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
-            "example" : null
-          }
+            "example" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。示例：clt.943da17996fb5cebfbc70c044c3fc25a57T54DcjT6HNKGqnUdxzy1******"
+          },
+          "example" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。示例：clt.943da17996fb5cebfbc70c044c3fc25a57T54DcjT6HNKGqnUdxzy1******"
         } ],
+        "requestBody" : {
+          "description" : "图片格式要求：\n\n* 显示区域大小（206*364）。\n* 方式（fill 充满），对于上传的预览图尺寸要求是 9:16，2M 以内。\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ConfigRegisterMaAppRequest"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
           "default" : {
-            "description" : "定制类小程序开发者注册信息",
+            "description" : "注册小程序预览图",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -9830,7 +9772,7 @@
                     "value" : "[{\n  \"err_no\": 0,\n  \"err_msg\": \"success\",\n  \"log_id\": \"20230630155829xxxxxxxxxxxxxxxxxxxxx\"\n}\n]\n"
                   },
                   "failed" : {
-                    "value" : "[{\n  \"err_no\": 28007004,\n  \"err_msg\": \"ecom_microapp_type参数错误,原因:枚举错误\",\n  \"log_id\": \"20230703161420Bxxxxxxxx\"\n}\n]\n"
+                    "value" : "[{\n  \"log_id\": \"20230630162xxxxxxxxxxxxxxxxxxxxxx\",\n  \"err_no\": 28007004,\n  \"err_msg\": \"url参数错误,原因:非法url\"\n}\n]\n"
                   }
                 }
               }
@@ -11868,7 +11810,7 @@
     "/api/trade/v2/fulfillment/verify_cancel" : {
       "post" : {
         "tags" : [ "trade-system" ],
-        "description" : "[撤销核销](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/fulfillment/douyin-code/verify-cancel)",
+        "description" : "[撤销核销](https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/trade-system/agency-trade-system/fulfillment/third-code/verify-cancel)",
         "operationId" : "postApiTradeV2FulfillmentVerifyCancel",
         "responses" : {
           "default" : {
@@ -18578,17 +18520,6 @@
             "description" : "外部单号，开发者系统的交易单号",
             "example" : "out123456"
           },
-          "description" : {
-            "type" : "string",
-            "description" : "错误码描述",
-            "example" : "success"
-          },
-          "error_code" : {
-            "type" : "integer",
-            "description" : "错误码，0为成功",
-            "format" : "int32",
-            "example" : 0
-          },
           "verify_token" : {
             "type" : "string",
             "description" : "一次验券的标识，在验券接口传入",
@@ -20329,16 +20260,11 @@
       "RefundCreateRefundData" : {
         "type" : "object",
         "properties" : {
-          "description" : {
-            "type" : "string",
-            "description" : "错误码描述",
-            "example" : "success"
-          },
-          "error_code" : {
+          "refund_audit_deadline" : {
             "type" : "integer",
-            "description" : "错误码，0为成功",
+            "description" : "退款审核的最后期限，13 位 unix 时间戳，精度：毫秒通常是3天(从退款发起时间开始算)",
             "format" : "int32",
-            "example" : 0
+            "example" : 151231321231
           },
           "refund_id" : {
             "type" : "string",
@@ -20347,7 +20273,7 @@
           }
         },
         "description" : "返回数据信息",
-        "example" : null
+        "example" : "success"
       },
       "RefundMerchantAuditCallbackResponse" : {
         "type" : "object",
@@ -21100,8 +21026,8 @@
         "properties" : {
           "capacity_key" : {
             "type" : "string",
-            "description" : "固定值“ma.jsapi.jump_live_room”",
-            "default" : "“ma.jsapi.jump_live_room”",
+            "description" : "固定值“ma.component.page_layout_custom”",
+            "default" : "“ma.component.page_layout_custom”",
             "example" : null
           },
           "apply_reason" : {
@@ -21137,6 +21063,11 @@
             "type" : "object",
             "properties" : { },
             "description" : "场景",
+            "example" : null
+          },
+          "scene_desc" : {
+            "type" : "string",
+            "description" : "使用场景描述",
             "example" : null
           }
         },
@@ -24913,19 +24844,11 @@
           },
           "err_msg" : {
             "type" : "string",
-            "description" : "错误信息",
-            "example" : null
-          },
-          "log_id" : {
-            "type" : "string",
-            "description" : "log_id，用于向内部开发人员进行反馈",
+            "description" : "错误描述",
             "example" : null
           },
           "data" : {
-            "type" : "object",
-            "properties" : { },
-            "description" : "响应结果",
-            "example" : null
+            "$ref" : "#/components/schemas/DataAnalysisQueryLiveDealDataData"
           }
         }
       },
@@ -25950,7 +25873,7 @@
           "data" : {
             "type" : "object",
             "properties" : { },
-            "description" : "响应结果（具体结构见下方正常实例）",
+            "description" : "响应结果（具体结构见下方正常",
             "example" : null
           }
         }
@@ -27353,27 +27276,6 @@
           }
         }
       },
-      "ConfigRegisterMaAppRequest" : {
-        "type" : "object",
-        "properties" : {
-          "app_id" : {
-            "type" : "string",
-            "description" : "小程序ID",
-            "example" : "\"ttcfdbbxxxxxxxxxxxxx\""
-          },
-          "ecom_microapp_type" : {
-            "type" : "integer",
-            "description" : "场景值：固定为2",
-            "format" : "int32",
-            "example" : 2
-          },
-          "preview_photo_url" : {
-            "type" : "string",
-            "description" : "图片地址",
-            "example" : "\"https://xxx/xxx.jpg\""
-          }
-        }
-      },
       "ConfigRegisterMaAppResponse" : {
         "type" : "object",
         "properties" : {
@@ -27392,6 +27294,27 @@
             "type" : "string",
             "description" : "请求标识",
             "example" : "\"20230630155829AExxxxxxxxxxxxx\""
+          }
+        }
+      },
+      "ConfigRegisterMaAppRequest" : {
+        "type" : "object",
+        "properties" : {
+          "app_id" : {
+            "type" : "string",
+            "description" : "小程序ID",
+            "example" : "\"ttcfdbbxxxxxxxxxxxxx\""
+          },
+          "ecom_microapp_type" : {
+            "type" : "integer",
+            "description" : "场景值：固定为2",
+            "format" : "int32",
+            "example" : 2
+          },
+          "preview_photo_url" : {
+            "type" : "string",
+            "description" : "图片地址",
+            "example" : "\"https://xxx/xxx.jpg\""
           }
         }
       },
