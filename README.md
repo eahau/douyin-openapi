@@ -15,12 +15,14 @@
 
 默认已生成 Java client 端的 [openfeign](https://github.com/OpenFeign/feign) 代码
 
+具体依赖请查看 [Maven Central](https://central.sonatype.com/namespace/io.github.eahau.openapi)
+
 - 小程序
 ```xml
       <dependency>
         <groupId>io.github.eahau.openapi</groupId>
         <artifactId>douyin-mini-app</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${douyin-openapi.verison}</version>
       </dependency>
 ```  
 
@@ -29,7 +31,7 @@
       <dependency>
         <groupId>io.github.eahau.openapi</groupId>
         <artifactId>douyin-dop</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${douyin-openapi.verison}</version>
       </dependency>
 ``` 
 
@@ -38,7 +40,7 @@
       <dependency>
         <groupId>io.github.eahau.openapi</groupId>
         <artifactId>douyin-local-life</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${douyin-openapi.verison}</version>
       </dependency>
 ```
 
