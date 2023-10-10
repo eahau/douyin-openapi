@@ -2,10 +2,6 @@ name: Publish jar to the Maven
 on:
   release:
     types: [created]
-# on:
-#   push:
-#     branches:
-#       - dev
 
 jobs:
   publish:
@@ -22,13 +18,10 @@ jobs:
           server-password: MAVEN_PASSWORD
       - name: Maven package
         run: mvn -P ci -pl -generator clean package
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
       - name: Release Maven package
         uses: samuelmeuli/action-maven-publish@v1
         with:
             gpg_private_key: ${{ secrets.GPG_SECRET }}
             gpg_passphrase: ${{ secrets.GPG_PASSWORD }}
             nexus_username: ${{ secrets.OSSRH_USER }}
-            nexus_password: ${{ secrets.OSSRH_PASSWORD }}
+            nexus_password: ${{ secrets.OSSRH_TOKEN }}
