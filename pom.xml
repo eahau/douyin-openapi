@@ -4,10 +4,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.github.eahau.openapi</groupId>
+  <groupId>io.github.eahau.openapi</groupId>
   <artifactId>douyin</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+
+  <name>douyin-openapi</name>
+  <url>https://github.com/eahau/douyin-openapi</url>
+  <description>douyin openapi</description>
+
   <modules>
     <module>generator</module>
     <module>dop</module>
@@ -316,11 +321,11 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.8</version>
+          <version>1.6.13</version>
           <extensions>true</extensions>
           <configuration>
             <serverId>ossrh</serverId>
-            <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
+            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
             <autoReleaseAfterClose>true</autoReleaseAfterClose>
           </configuration>
         </plugin>
@@ -382,6 +387,11 @@
       <email>eahau@qq.com</email>
     </developer>
   </developers>
+
+  <scm>
+    <url>https://github.com/eahau/douyin-openapi</url>
+    <connection>https://github.com/eahau/douyin-openapi.git</connection>
+  </scm>
 
   <distributionManagement>
     <snapshotRepository>
