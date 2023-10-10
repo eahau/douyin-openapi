@@ -620,45 +620,34 @@
     },
     "/goodlife/v1/fulfilment/create/callback/" : {
       "post" : {
-        "tags" : [ "tripartite.code" ],
-        "description" : "[发券回调](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/tripartite.code/callback)",
+        "tags" : [ "JiuLv" ],
+        "description" : "[凭证回调（异步发券OpenAPI）](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/booking/code-callback)",
         "operationId" : "postGoodlifeV1FulfilmentCreateCallback",
         "parameters" : [ {
-          "name" : "Content-Type",
+          "name" : "content-type",
           "in" : "header",
-          "description" : "application/json",
+          "description" : "固定值 \"application/json\"",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "application/json",
+            "description" : "固定值 \"application/json\"",
             "default" : "application/json",
             "example" : null
           }
         }, {
           "name" : "access-token",
           "in" : "header",
-          "description" : "根据这个地址获取的token",
+          "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "根据这个地址获取的token",
+            "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
             "example" : null
           }
         } ],
-        "requestBody" : {
-          "description" : "1、(非必需) 抖音侧先申请服务商发码，如果能同步返回结果则不需要本接口，如果异步返回结果则调用本接口通知抖音。\n2、error_code 为 0 代表通知成功，如未成功请重试。\n3、10 分钟后未发码，抖音会发起退款申请。如需要补发，通过退款接口拒绝退款时补发券码。\n\n",
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateCallbackRequest"
-              }
-            }
-          },
-          "required" : true
-        },
         "responses" : {
           "default" : {
-            "description" : "发券回调",
+            "description" : "凭证回调（异步发券OpenAPI）",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -666,7 +655,7 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n  \"data\": \"xxx\",\n  \"certificate_info_list\": [\n      {\n        \"certificate_id\": \"123123123123\",\n        \"code\": \"ABACCC\"\n      },\n      {\n        \"certificate_id\": \"923123123123\",\n        \"code\": \"ABACCC\"\n      }\n    ],\n    \"error_code\": 0,\n    \"description\": \"success\"\n},\n\"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"xxx\"\n  }\n}\n]\n"
+                    "value" : "[{\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"2020070614111601022506808001045D59\",\n    \"now\": 1651131270\n  }\n}\n]\n"
                   },
                   "failed" : {
                     "value" : null
@@ -4940,27 +4929,6 @@
         "description" : "团购信息",
         "example" : null
       },
-      "CreateCallbackResponse" : {
-        "type" : "object",
-        "properties" : {
-          "data" : {
-            "type" : "object",
-            "properties" : { },
-            "example" : null
-          },
-          "certificate_info_list" : {
-            "$ref" : "#/components/schemas/CreateCallbackCertificateInfoList"
-          },
-          "extra" : {
-            "$ref" : "#/components/schemas/extra"
-          },
-          "logid" : {
-            "type" : "string",
-            "description" : "抖音侧排查问题的标示",
-            "example" : null
-          }
-        }
-      },
       "CreateCallbackRequest" : {
         "type" : "object",
         "properties" : {
@@ -5076,6 +5044,14 @@
         },
         "description" : "可自定义的项目（例：景区项目索道A、索道B等）",
         "example" : null
+      },
+      "CreateCallbackResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
+        }
       },
       "CreateCallbackCertificateInfoList" : {
         "type" : "object",

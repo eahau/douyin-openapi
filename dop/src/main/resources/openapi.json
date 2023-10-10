@@ -6045,9 +6045,20 @@
     "/im/recall/msg/" : {
       "post" : {
         "tags" : [ "interaction-management" ],
-        "description" : "[撤回群消息](https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/openapi/interaction-management/group-chat/group-msg/group-msg-recall)",
+        "description" : "[私信消息撤回](https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/openapi/interaction-management/private-message/recall-msg)",
         "operationId" : "postImRecallMsg",
         "parameters" : [ {
+          "name" : "open_id",
+          "in" : "query",
+          "description" : "撤回消息人的 open_id通过/oauth/access_token/ 获取，用户唯一标志",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "撤回消息人的 open_id通过/oauth/access_token/ 获取，用户唯一标志",
+            "example" : "ba253642-0590-40bc-9bdf-9a1334b94059"
+          },
+          "example" : "ba253642-0590-40bc-9bdf-9a1334b94059"
+        }, {
           "name" : "Content-Type",
           "in" : "header",
           "description" : "固定值 \"application/json\"",
@@ -6061,17 +6072,28 @@
         }, {
           "name" : "access-token",
           "in" : "header",
-          "description" : "调用 /oauth/access_token/生成的 token，此 token需要用户授权。",
+          "description" : "调用 /oauth/access_token/ 生成的 token，此 token 需要用户授权",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "调用 /oauth/access_token/生成的 token，此 token需要用户授权。",
+            "description" : "调用 /oauth/access_token/ 生成的 token，此 token 需要用户授权",
             "example" : null
           }
         } ],
+        "requestBody" : {
+          "description" : "与接收私信事件配合使用，开发者应先订阅相关 webhook 事件：订阅接收私信事件须先申请 im.direct_message 权限。\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RecallMsgRequest"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
           "default" : {
-            "description" : "撤回群消息",
+            "description" : "私信消息撤回",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -6082,7 +6104,7 @@
                     "value" : "[{\n  \"err_msg\": \"\",\n  \"err_no\": 0,\n  \"log_id\": \"202302021924599A4FB64DA382950444C7\"\n}\n]\n"
                   },
                   "failed" : {
-                    "value" : "[{\n  \"err_msg\": \"参数异常\",\n  \"err_no\": 28003036,\n  \"log_id\": \"20230202192209192B1185C6C1408E4EDB\"\n}\n]\n"
+                    "value" : "[{\n  \"err_msg\": \"消息发出已超过时间无法撤回\",\n  \"err_no\": 28003036,\n  \"log_id\": \"20230202192209192B1185C6C1408E4EDB\"\n}\n]\n"
                   }
                 }
               }
@@ -16330,6 +16352,27 @@
         },
         "example" : null
       },
+      "RecallMsgResponse" : {
+        "type" : "object",
+        "properties" : {
+          "err_msg" : {
+            "type" : "string",
+            "description" : "错误信息",
+            "example" : "消息发出已超过72小时无法撤回"
+          },
+          "err_no" : {
+            "type" : "integer",
+            "description" : "错误码，0 代表成功，其他表示异常",
+            "format" : "int32",
+            "example" : 0
+          },
+          "log_id" : {
+            "type" : "string",
+            "description" : "日志id",
+            "example" : "20230202192209192B1185C6C1408E4EDB"
+          }
+        }
+      },
       "RecallMsgRequest" : {
         "type" : "object",
         "properties" : {
@@ -16348,27 +16391,6 @@
             "description" : "会话类型 ， 1 私聊",
             "format" : "int32",
             "example" : 1
-          }
-        }
-      },
-      "RecallMsgResponse" : {
-        "type" : "object",
-        "properties" : {
-          "err_msg" : {
-            "type" : "string",
-            "description" : "错误描述",
-            "example" : "\"\""
-          },
-          "err_no" : {
-            "type" : "integer",
-            "description" : "错误码",
-            "format" : "int32",
-            "example" : 0
-          },
-          "log_id" : {
-            "type" : "string",
-            "description" : "请求唯一标识",
-            "example" : "20128YGFWGKKKHE"
           }
         }
       },
