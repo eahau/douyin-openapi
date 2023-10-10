@@ -396,7 +396,7 @@
 
   <profiles>
     <profile>
-      <id>ci</id>
+      <id>deploy</id>
       <modules>
         <module>dop</module>
         <module>mini-app</module>
