@@ -14,14 +14,8 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
           server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-      - name: Maven package
-        run: mvn -P deploy -pl -generator clean package
-      - name: Release Maven package
-        uses: samuelmeuli/action-maven-publish@v1
-        with:
-            gpg_private_key: ${{ secrets.GPG_SECRET }}
-            gpg_passphrase: ${{ secrets.GPG_PASSWORD }}
-            nexus_username: ${{ secrets.OSSRH_USER }}
-            nexus_password: ${{ secrets.OSSRH_TOKEN }}
+          server-username: ${{ secrets.OSSRH_USER }}
+          server-password: ${{ secrets.OSSRH_TOKEN }}
+          gpg-passphrase:  ${{ secrets.GPG_PASSWORD }}
+      - name: Publish to Apache Maven Central
+        run: mvn -P deploy -pl -generator deploy
