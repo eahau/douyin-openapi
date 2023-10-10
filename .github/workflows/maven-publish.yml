@@ -17,7 +17,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: Maven package
-        run: mvn -P ci -pl -generator clean package
+        run: mvn -P deploy -pl -generator clean package
       - name: Release Maven package
         uses: samuelmeuli/action-maven-publish@v1
         with:
