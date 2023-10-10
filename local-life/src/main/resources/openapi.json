@@ -620,34 +620,45 @@
     },
     "/goodlife/v1/fulfilment/create/callback/" : {
       "post" : {
-        "tags" : [ "JiuLv" ],
-        "description" : "[凭证回调（异步发券OpenAPI）](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/JiuLv/booking/code-callback)",
+        "tags" : [ "tripartite.code" ],
+        "description" : "[发券回调](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/tripartite.code/callback)",
         "operationId" : "postGoodlifeV1FulfilmentCreateCallback",
         "parameters" : [ {
-          "name" : "content-type",
+          "name" : "Content-Type",
           "in" : "header",
-          "description" : "固定值 \"application/json\"",
+          "description" : "application/json",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "固定值 \"application/json\"",
+            "description" : "application/json",
             "default" : "application/json",
             "example" : null
           }
         }, {
           "name" : "access-token",
           "in" : "header",
-          "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
+          "description" : "根据这个地址获取的token",
           "required" : true,
           "schema" : {
             "type" : "string",
-            "description" : "调用/oauth/client_token/生成的 token，此 token 不需要用户授权。",
+            "description" : "根据这个地址获取的token",
             "example" : null
           }
         } ],
+        "requestBody" : {
+          "description" : "1、(非必需) 抖音侧先申请服务商发码，如果能同步返回结果则不需要本接口，如果异步返回结果则调用本接口通知抖音。\n2、error_code 为 0 代表通知成功，如未成功请重试。\n3、10 分钟后未发码，抖音会发起退款申请。如需要补发，通过退款接口拒绝退款时补发券码。\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateCallbackRequest"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
           "default" : {
-            "description" : "凭证回调（异步发券OpenAPI）",
+            "description" : "发券回调",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -655,7 +666,67 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "[{\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"2020070614111601022506808001045D59\",\n    \"now\": 1651131270\n  }\n}\n]\n"
+                    "value" : "[{\n  \"data\": \"xxx\",\n  \"certificate_info_list\": [\n      {\n        \"certificate_id\": \"123123123123\",\n        \"code\": \"ABACCC\"\n      },\n      {\n        \"certificate_id\": \"923123123123\",\n        \"code\": \"ABACCC\"\n      }\n    ],\n    \"error_code\": 0,\n    \"description\": \"success\"\n},\n\"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"xxx\"\n  }\n}\n]\n"
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/fulfilment/refund/audit/" : {
+      "post" : {
+        "tags" : [ "tripartite.code" ],
+        "description" : "[审核回调](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/tripartite.code/refund.audit)",
+        "operationId" : "postGoodlifeV1FulfilmentRefundAudit",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "1、审核结果为拒绝时必须要告知抖音拒绝原因，若没有原因将会返回报错，拦截本次审核结果\n2、「退款」接口中抖音的请求中 certificate_id 对应 code 为空，且最终服务商侧的审核结果为拒绝，必须在回调抖音时将 code 补上，否则将返回报错，拦截本次审核结果(具体参数见下方请求参数)\n3、返回结果中 error_code 为 0 代表通知成功；其他值可当作通知失败，需做重试\n4、若服务商未能在收到「退款」请求后 24 小时内成功告知抖音审核结果，那么本次请求将会被自动审核通过，完成后续的退款流程\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RefundAuditRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "审核回调",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RefundAuditResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : "[{\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"2020070614111601022506808001045D59\"\n  }\n}\n]\n"
                   },
                   "failed" : {
                     "value" : null
@@ -1307,6 +1378,66 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/SkuBatchSaveResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : "[{\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\"\n  },\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"sub_error_code\": 0,\n    \"sub_description\": \"\",\n    \"logid\": \"xxx\",\n    \"now\": 1651113600\n  }\n}\n]\n"
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/goods/stock/sync/" : {
+      "post" : {
+        "tags" : [ "goods" ],
+        "description" : "[同步库存](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/goods/batch.save)",
+        "operationId" : "postGoodlifeV1GoodsStockSync",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "无\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StockSyncRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "同步库存",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StockSyncResponse"
                 },
                 "examples" : {
                   "succeed" : {
@@ -2137,6 +2268,66 @@
         }
       }
     },
+    "/goodlife/v1/poi/poi/sync/" : {
+      "post" : {
+        "tags" : [ "life.capacity.shop" ],
+        "description" : "[同步门店账户](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/life.capacity.shop/poisync)",
+        "operationId" : "postGoodlifeV1PoiPoiSync",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "requestBody" : {
+          "description" : "无\n\n",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PoiSyncRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "default" : {
+            "description" : "同步门店账户",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PoiSyncResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/goodlife/v1/poi/poi/update/" : {
       "post" : {
         "tags" : [ "life.capacity.shop" ],
@@ -2263,7 +2454,7 @@
           }
         } ],
         "requestBody" : {
-          "description" : "<ol start=\"1\"><li>查询离分账单下载的url</li></ol>\n\n",
+          "description" : "* 查询离分账单下载的url\n\n",
           "content" : {
             "application/json" : {
               "schema" : {
@@ -2283,7 +2474,7 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "{\n  \"extra\": {\n    \"description\": \"success\",\n    \"error_code\": 0,\n    \"logid\": \"20230322164012FB09AEAF23D9A802F75C\",\n    \"now\": 1679474413,\n    \"sub_description\": \"\",\n    \"sub_error_code\": 0\n  },\n  \"urls\": [\n    \"https://sf6-sign.douyinstatic.com/aweme-namek-secret/download_record_hive/bill_record/bill_ledger/7212930162071963708.xlsx?x-expires=1682152813&x-signature=EgzI%2BdKQxYZWgSMLypD5xIl17zA%3D\"\n  ],\n  \"data\": {\n    \"description\": \"success\",\n    \"error_code\": 0\n  }\n}\n"
+                    "value" : "[{\n  \"extra\": {\n    \"description\": \"success\",\n    \"error_code\": 0,\n    \"logid\": \"20230322164012FB09AEAF23D9A802F75C\",\n    \"now\": 1679474413,\n    \"sub_description\": \"\",\n    \"sub_error_code\": 0\n  },\n  \"urls\": [\n    \"https://sf6-sign.douyinstatic.com/aweme-namek-secret/download_record_hive/bill_record/bill_ledger/7212930162071963708.xlsx?x-expires=1682152813&x-signature=EgzI%2BdKQxYZWgSMLypD5xIl17zA%3D\"\n  ],\n  \"data\": {\n    \"description\": \"success\",\n    \"error_code\": 0\n  }\n}\n]\n"
                   },
                   "failed" : {
                     "value" : null
@@ -2312,7 +2503,7 @@
           }
         } ],
         "requestBody" : {
-          "description" : "<ol start=\"1\"><li>查询离线返佣账单下载的url</li></ol>\n\n",
+          "description" : "* 查询离线返佣账单下载的url\n\n",
           "content" : {
             "application/json" : {
               "schema" : {
@@ -2332,7 +2523,7 @@
                 },
                 "examples" : {
                   "succeed" : {
-                    "value" : "{\n  \"extra\": {\n    \"description\": \"success\",\n    \"error_code\": 0,\n    \"logid\": \"2023032215205100FD5F2B5C363502A40F\",\n    \"now\": 1679469652,\n    \"sub_description\": \"\",\n    \"sub_error_code\": 0\n  },\n  \"urls\": [\n    \"https://sf9-sign.douyinstatic.com/aweme-namek-secret/download_record_hive/bill_record/bill_rebate/7212930161757390905.xlsx?x-expires=1682148052&x-signature=eEpqWdtx9HJFkUUnQplRspP1u4s%3D\"\n  ],\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\"\n  }\n}\n"
+                    "value" : "[{\n  \"extra\": {\n    \"description\": \"success\",\n    \"error_code\": 0,\n    \"logid\": \"2023032215205100FD5F2B5C363502A40F\",\n    \"now\": 1679469652,\n    \"sub_description\": \"\",\n    \"sub_error_code\": 0\n  },\n  \"urls\": [\n    \"https://sf9-sign.douyinstatic.com/aweme-namek-secret/download_record_hive/bill_record/bill_rebate/7212930161757390905.xlsx?x-expires=1682148052&x-signature=eEpqWdtx9HJFkUUnQplRspP1u4s%3D\"\n  ],\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\"\n  }\n}\n]\n"
                   },
                   "failed" : {
                     "value" : null
@@ -2533,6 +2724,96 @@
                 "examples" : {
                   "succeed" : {
                     "value" : "{\n  \"data\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"ledger_records\": {\n      \"11224112312\": {\n        \"cursor\": \"7064492324109305863\",\n        \"ledger_id\": \"7064492324109305863\",\n        \"verify_id\": \"7064491846000592903\",\n        \"certificate_id\": \"7064423012048865293\",\n        \"order_id\": \"7062268392329758757\",\n        \"verify_time\": 1644830204,\n        \"status\": 2,\n        \"code\": \"100566718260\",\n        \"amount\": {\n          \"amount\": {\n            \"original\": 50,\n            \"pay\": 45,\n            \"merchant_ticket\": 0\n            \"goods\": 50,\n            \"pay_handling\": 0,\n            \"talent_commission\": 0\n          }\n        },\n        \"goods\": {\n          \"sku_id\": \"1721554180176909\",\n          \"title\": \"测试结算中台分店\",\n          \"market_price\": 500,\n          \"sold_start_time\": 1641801900\n        }\n      }\n  },\n  \"ledger_second_records\": {\n      \"11224112312\": {\n        \"cursor\": \"7064492324109305863\",\n        \"ledger_id\": \"7064492324109305863\",\n        \"verify_id\": \"7064491846000592903\",\n        \"order_id\": \"7062268392329758757\",\n        \"verify_time\": 1644830204,\n        \"status\": 2,\n        \"amount\": {\n          \"amount\": {\n            \"merchant_freight\": 50,\n            \"merchant_tip\": 45,\n            \"merchant_cancel_freight\": 0\n            \"platform_duty_freight\": 50,\n            \"platform_duty_tip\": 0\n          }\n        },\n        \"goods\": {\n          \"sku_id\": \"1721554180176909\",\n          \"title\": \"测试结算中台分店\",\n          \"market_price\": 500,\n          \"sold_start_time\": 1641801900\n        }\n      }\n  }\n  \"extra\": {\n    \"error_code\": 0,\n    \"description\": \"success\",\n    \"logid\": \"xxxxxxxxxxxxxx\",\n  }\n}\n"
+                  },
+                  "failed" : {
+                    "value" : null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodlife/v1/settle/ledger/query/" : {
+      "get" : {
+        "tags" : [ "life.capacity.billing" ],
+        "description" : "[账单查询](https://developer.open-douyin.com/docs/resource/zh-CN/local-life/develop/OpenAPI/life.capacity.billing/merchantquery)",
+        "operationId" : "getGoodlifeV1SettleLedgerQuery",
+        "parameters" : [ {
+          "name" : "account_id",
+          "in" : "query",
+          "description" : "商户id",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "商户id",
+            "example" : null
+          }
+        }, {
+          "name" : "cursor",
+          "in" : "query",
+          "description" : "查询游标，第一页查询传\"0\"，翻页查使用上一次查询返回cursor",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "查询游标，第一页查询传\"0\"，翻页查使用上一次查询返回cursor",
+            "example" : null
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "页大小，取值范围1～100",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "description" : "页大小，取值范围1～100",
+            "format" : "int32",
+            "example" : null
+          }
+        }, {
+          "name" : "bill_date",
+          "in" : "query",
+          "description" : "核销日期，格式为\"2006-01-02\"",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "核销日期，格式为\"2006-01-02\"",
+            "example" : null
+          }
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "application/json",
+            "default" : "application/json",
+            "example" : null
+          }
+        }, {
+          "name" : "access-token",
+          "in" : "header",
+          "description" : "根据这个地址获取的token",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "根据这个地址获取的token",
+            "example" : null
+          }
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "账单查询",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LedgerQueryResponse"
+                },
+                "examples" : {
+                  "succeed" : {
+                    "value" : null
                   },
                   "failed" : {
                     "value" : null
@@ -4929,6 +5210,27 @@
         "description" : "团购信息",
         "example" : null
       },
+      "CreateCallbackResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "object",
+            "properties" : { },
+            "example" : null
+          },
+          "certificate_info_list" : {
+            "$ref" : "#/components/schemas/CreateCallbackCertificateInfoList"
+          },
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          },
+          "logid" : {
+            "type" : "string",
+            "description" : "抖音侧排查问题的标示",
+            "example" : null
+          }
+        }
+      },
       "CreateCallbackRequest" : {
         "type" : "object",
         "properties" : {
@@ -5045,14 +5347,6 @@
         "description" : "可自定义的项目（例：景区项目索道A、索道B等）",
         "example" : null
       },
-      "CreateCallbackResponse" : {
-        "type" : "object",
-        "properties" : {
-          "extra" : {
-            "$ref" : "#/components/schemas/extra"
-          }
-        }
-      },
       "CreateCallbackCertificateInfoList" : {
         "type" : "object",
         "properties" : {
@@ -5080,6 +5374,43 @@
         },
         "description" : "券关系列表（只有请求中回传了第三方订单号时，会返回）",
         "example" : null
+      },
+      "RefundAuditRequest" : {
+        "type" : "object",
+        "properties" : {
+          "order_id" : {
+            "type" : "string",
+            "description" : "抖音侧订单 ID",
+            "default" : "10001",
+            "example" : null
+          },
+          "biz_uniq_key" : {
+            "type" : "string",
+            "description" : "业务唯一键",
+            "default" : "123456",
+            "example" : null
+          },
+          "audit_result" : {
+            "type" : "integer",
+            "description" : "退款审核结果，1 接受，2 拒绝",
+            "format" : "int32",
+            "default" : 1,
+            "example" : null
+          },
+          "refund_fee_amount" : {
+            "type" : "integer",
+            "description" : "通过审核时必须传，退款手续费金额，分",
+            "format" : "int32",
+            "default" : 2340,
+            "example" : null
+          }
+        }
+      },
+      "RefundAuditResponse" : {
+        "type" : "object",
+        "properties" : {
+          "extra" : { }
+        }
       },
       "CategoryGetRequest" : {
         "type" : "object",
@@ -6785,6 +7116,73 @@
         }
       },
       "SkuBatchSaveData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误描述",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "响应信息",
+        "example" : null
+      },
+      "StockSyncRequest" : {
+        "type" : "object",
+        "properties" : {
+          "product_id" : {
+            "type" : "string",
+            "description" : "商品id(若有第三方id可不传）",
+            "example" : null
+          },
+          "out_id" : {
+            "type" : "string",
+            "description" : "商品第三方id",
+            "example" : null
+          },
+          "stock" : {
+            "$ref" : "#/components/schemas/StockSyncStock"
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "商家ID，传入时服务商须与该商家满足授权关系",
+            "example" : null
+          }
+        }
+      },
+      "StockSyncStock" : {
+        "type" : "object",
+        "properties" : {
+          "limit_type" : {
+            "type" : "integer",
+            "description" : "库存上限类型，为2时stock_qty和avail_qty字段无意义 1-有限库存 2-无限库存",
+            "format" : "int32",
+            "example" : null
+          },
+          "stock_qty" : {
+            "type" : "integer",
+            "description" : "总库存，limit_type=2时无意义",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "库存信息",
+        "example" : null
+      },
+      "StockSyncResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : { },
+          "extra" : { }
+        }
+      },
+      "StockSyncData" : {
         "type" : "object",
         "properties" : {
           "description" : {
@@ -8609,6 +9007,360 @@
         },
         "example" : null
       },
+      "PoiSyncRequest" : {
+        "type" : "object",
+        "properties" : {
+          "target_type" : {
+            "type" : "integer",
+            "description" : "目标类型，0=商家 1=服务商-品牌户 2=服务商-门店户",
+            "format" : "int32",
+            "example" : null
+          },
+          "datas" : {
+            "$ref" : "#/components/schemas/PoiSyncDatas"
+          }
+        }
+      },
+      "PoiSyncDatas" : {
+        "type" : "object",
+        "properties" : {
+          "owner" : {
+            "$ref" : "#/components/schemas/PoiSyncOwner"
+          },
+          "license" : {
+            "$ref" : "#/components/schemas/PoiSyncLicense"
+          },
+          "third_id" : {
+            "type" : "string",
+            "description" : "接入方门店id",
+            "example" : null
+          },
+          "legal_person" : {
+            "$ref" : "#/components/schemas/PoiSyncLegalPerson"
+          },
+          "business_partnership" : {
+            "$ref" : "#/components/schemas/PoiSyncBusinessPartnership"
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "target_type=0,1时必填，门店品牌母公司life_account_id",
+            "example" : null
+          },
+          "industry" : {
+            "$ref" : "#/components/schemas/PoiSyncIndustry"
+          },
+          "poi_id" : {
+            "type" : "string",
+            "description" : "抖音门店ID（poi_id）",
+            "example" : null
+          },
+          "poi_claim_authorization" : {
+            "$ref" : "#/components/schemas/PoiSyncPoiClaimAuthorization"
+          }
+        },
+        "example" : null
+      },
+      "PoiSyncOwner" : {
+        "type" : "object",
+        "properties" : {
+          "role" : {
+            "type" : "string",
+            "description" : "职务",
+            "example" : null
+          },
+          "phone" : {
+            "type" : "string",
+            "description" : "手机号，非座机，格式参见",
+            "example" : null
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "名称",
+            "example" : null
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "邮箱",
+            "example" : null
+          }
+        },
+        "description" : "联系人信息",
+        "example" : null
+      },
+      "PoiSyncLicense" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string",
+            "description" : "经营地址-详细地址",
+            "example" : null
+          },
+          "province" : {
+            "type" : "string",
+            "description" : "经营地址-省",
+            "example" : null
+          },
+          "use_ocr" : {
+            "type" : "boolean",
+            "description" : "本次营业执照信息传入是否以OCR识别为主useOcr=true ，数据都走ocr识别useOcr=false，就不走ocr识别，而是用传入的参数",
+            "default" : false,
+            "example" : null
+          },
+          "city" : {
+            "type" : "string",
+            "description" : "经营地址-市",
+            "example" : null
+          },
+          "legal_person_name" : {
+            "type" : "string",
+            "description" : "主体上的法人信息，如张三",
+            "example" : null
+          },
+          "license_type" : {
+            "type" : "integer",
+            "description" : "主体类型（91-企业，92-个体工商户）",
+            "format" : "int32",
+            "example" : null
+          },
+          "license_id" : {
+            "type" : "string",
+            "description" : "信用代码",
+            "example" : null
+          },
+          "company_name" : {
+            "type" : "string",
+            "description" : "公司名称",
+            "example" : null
+          },
+          "expiration" : {
+            "type" : "string",
+            "description" : "营业执照有效期，如2022-04-19",
+            "example" : null
+          },
+          "license_urls" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "营业执照照片",
+            "example" : null
+          }
+        },
+        "description" : "营业执照信息",
+        "example" : null
+      },
+      "PoiSyncLegalPerson" : {
+        "type" : "object",
+        "properties" : {
+          "id_card_no" : {
+            "type" : "string",
+            "description" : "证件号码",
+            "example" : null
+          },
+          "use_ocr" : {
+            "type" : "boolean",
+            "description" : "本次法人身份证信息的传入是否以OCR识别的为主useOcr=true，数据都走ocr识别useOcr=false，就不走ocr识别，而是用传入的参数",
+            "default" : false,
+            "example" : null
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "姓名",
+            "example" : null
+          },
+          "id_card_expiration" : {
+            "type" : "string",
+            "description" : "有效期，如2022-04-19",
+            "example" : null
+          },
+          "id_card_front_url" : {
+            "type" : "string",
+            "description" : "证件正面图片链接",
+            "example" : null
+          },
+          "id_card_back_url" : {
+            "type" : "string",
+            "description" : "身份证背面图片链接",
+            "example" : null
+          }
+        },
+        "description" : "法人身份证信息",
+        "example" : null
+      },
+      "PoiSyncBusinessPartnership" : {
+        "type" : "object",
+        "properties" : {
+          "authorization" : {
+            "$ref" : "#/components/schemas/PoiSyncAuthorization"
+          }
+        },
+        "description" : "商服合作信息，在target_type != 0时必填注意：* 满足任一条件，则无法建联该商家已经在抖来客app上与服务商建联（平台代运营，非小程序代运营）该商家已经与其他服务商建联(如果是迁移商家，则可以豁免)该商家已经签约了群峰订单该商家的母账户（品牌户）已经签约了平台代运营",
+        "example" : null
+      },
+      "PoiSyncAuthorization" : {
+        "type" : "object",
+        "properties" : {
+          "effective_time" : {
+            "type" : "string",
+            "description" : "服务商和商家合作的生效日期，如2022-04-19",
+            "example" : null
+          },
+          "urls" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "非标合作协议/商服承诺函图片链接",
+            "example" : null
+          },
+          "agreement" : {
+            "type" : "integer",
+            "description" : "合作内容，1=技术服务",
+            "format" : "int32",
+            "example" : null
+          },
+          "app_ids" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "小程序列表",
+            "example" : null
+          },
+          "expiration" : {
+            "type" : "string",
+            "description" : "服务商和商家合作的截止日期，如2022-04-19。注意：截止日期如果早于当前时间，则视为失效/无效数据。",
+            "example" : null
+          },
+          "type" : {
+            "type" : "integer",
+            "description" : "授权类型，1=非标合作协议 2=抖音商服承诺函注意：两个协议都必传，支持同时传，都选1即可1为服务商自己和商家签署的合同（仅对部分服务商和商家开放）2为基于抖音平台模板传入的标准承诺函，模板请见：https://microapp.bytedance.com/docs/zh-CN/mini-app/thirdparty/SA/POI/qualmaterial/",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "服务商和商家的合作证明",
+        "example" : null
+      },
+      "PoiSyncIndustry" : {
+        "type" : "object",
+        "properties" : {
+          "qualifications" : {
+            "$ref" : "#/components/schemas/PoiSyncQualifications"
+          },
+          "minor_industry_codes" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "辅营行业类目",
+            "example" : null
+          },
+          "major_industry_code" : {
+            "type" : "string",
+            "description" : "主营行业类目 检索词典：生活服务类目开放-治理侧https://school.oceanengine.com/product_help/content/668400000020/121060",
+            "example" : null
+          }
+        },
+        "description" : "行业资质信息 行业对应的资质要求注意：行业资质是平台POI亮照、商品关联POI的重要参考；因此，请服务商尽量提供。多证合一的商家、行业资质可再传一次营业执照图片https://school.oceanengine.com/mobile/v2/pages/help/detail?productId=668400000020&articleId=121060",
+        "example" : null
+      },
+      "PoiSyncQualifications" : {
+        "type" : "object",
+        "properties" : {
+          "qualification_expiration" : {
+            "type" : "string",
+            "description" : "许可证有效期，如2022-04-19",
+            "example" : null
+          },
+          "qualification_urls" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "许可证图片链接",
+            "example" : null
+          },
+          "qualification_type" : {
+            "type" : "integer",
+            "description" : "许可证类型需要按许可证图片上的名称传入* 餐饮行业常用编码提示：食品经营许可证-2001 或 餐饮服务许可证-2002* 到综行业常用编码提示：公共场所卫生许可证-2003* 酒旅行业常用编码提示：公共场所卫生许可证-2003、特种行业许可证-2015、食品经营许可证-2001* 其他行业还请参考：资质类型梳理 生活服务类目开放-治理侧 传入",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "许可证信息",
+        "example" : null
+      },
+      "PoiSyncPoiClaimAuthorization" : {
+        "type" : "object",
+        "properties" : {
+          "effective_time" : {
+            "type" : "string",
+            "description" : "生效时间",
+            "example" : null
+          },
+          "urls" : {
+            "type" : "object",
+            "properties" : { },
+            "description" : "认领函图片",
+            "example" : null
+          }
+        },
+        "description" : "门店认领函信息",
+        "example" : null
+      },
+      "PoiSyncResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/PoiSyncData"
+          },
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
+        }
+      },
+      "PoiSyncData" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "错误码描述",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码，成功返回0",
+            "format" : "int32",
+            "example" : null
+          },
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PoiSyncTasks"
+            },
+            "example" : null
+          }
+        },
+        "example" : null
+      },
+      "PoiSyncTasks" : {
+        "type" : "object",
+        "properties" : {
+          "third_id" : {
+            "type" : "string",
+            "description" : "开发者门店id",
+            "example" : null
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "商家品牌户商户id",
+            "example" : null
+          },
+          "task_id" : {
+            "type" : "integer",
+            "description" : "任务id",
+            "format" : "int32",
+            "example" : null
+          },
+          "poi_id" : {
+            "type" : "string",
+            "description" : "抖音门店id",
+            "example" : null
+          }
+        },
+        "example" : null
+      },
       "PoiUpdateRequest" : {
         "type" : "object",
         "properties" : {
@@ -8825,7 +9577,9 @@
           "data" : {
             "$ref" : "#/components/schemas/PoiUpdateData"
           },
-          "extra" : { }
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
         }
       },
       "PoiUpdateData" : {
@@ -9531,13 +10285,238 @@
         "description" : "二次分账单列表 含配送信息等 key为order_id， value为分账单信息",
         "example" : null
       },
+      "LedgerQueryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/LedgerQueryData"
+          },
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
+        }
+      },
+      "LedgerQueryData" : {
+        "type" : "object",
+        "properties" : {
+          "cursor" : {
+            "type" : "string",
+            "description" : "若有下页，通过此cursor查询下一页",
+            "example" : null
+          },
+          "ledger_records" : {
+            "type" : "array",
+            "description" : "分账明细列表",
+            "items" : {
+              "$ref" : "#/components/schemas/LedgerQueryLedgerRecords"
+            },
+            "example" : null
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "错误码描述",
+            "example" : null
+          },
+          "error_code" : {
+            "type" : "integer",
+            "description" : "错误码，0为成功",
+            "format" : "int32",
+            "example" : null
+          },
+          "has_more" : {
+            "type" : "boolean",
+            "description" : "是否有下一页",
+            "default" : false,
+            "example" : null
+          }
+        },
+        "example" : null
+      },
+      "LedgerQueryLedgerRecords" : {
+        "type" : "object",
+        "properties" : {
+          "order_attribute" : {
+            "$ref" : "#/components/schemas/LedgerQueryOrderAttribute"
+          },
+          "amount" : {
+            "$ref" : "#/components/schemas/LedgerQueryAmount"
+          },
+          "sku_order_id" : {
+            "type" : "string",
+            "description" : "sku维度订单id",
+            "example" : null
+          },
+          "certificate" : {
+            "$ref" : "#/components/schemas/LedgerQueryCertificate"
+          },
+          "goods" : {
+            "$ref" : "#/components/schemas/LedgerQueryGoods"
+          },
+          "item_order_id" : {
+            "type" : "string",
+            "description" : "item维度订单id",
+            "example" : null
+          },
+          "receipt_bill_key" : {
+            "type" : "string",
+            "description" : "发票月账单的key",
+            "example" : null
+          },
+          "account_id" : {
+            "type" : "string",
+            "description" : "分账商家账户id",
+            "example" : null
+          },
+          "ledger_time" : {
+            "type" : "integer",
+            "description" : "分账成功时间，秒级时间戳",
+            "format" : "int32",
+            "example" : null
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "唯一标识，无业务含义",
+            "example" : null
+          },
+          "poi_id" : {
+            "type" : "string",
+            "description" : "门店id，不存在时不返回",
+            "example" : null
+          },
+          "order_id" : {
+            "type" : "string",
+            "description" : "订单id",
+            "example" : null
+          },
+          "ledger_id" : {
+            "type" : "string",
+            "description" : "分账单id",
+            "example" : null
+          },
+          "status" : {
+            "type" : "integer",
+            "description" : "分账单状态，0-待分账，1-分账中，2-分账成功，3-分账失败，4-废弃（代表逻辑删除）",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "分账明细列表",
+        "example" : null
+      },
+      "LedgerQueryOrderAttribute" : {
+        "type" : "object",
+        "properties" : {
+          "room_id" : {
+            "type" : "string",
+            "description" : "直播间id，不存在时不返回",
+            "example" : null
+          },
+          "source" : {
+            "type" : "string",
+            "description" : "订单来源",
+            "example" : null
+          },
+          "video_id" : {
+            "type" : "string",
+            "description" : "视频id，不存在时不返回",
+            "example" : null
+          }
+        },
+        "description" : "订单归因信息",
+        "example" : null
+      },
+      "LedgerQueryAmount" : {
+        "type" : "object",
+        "properties" : {
+          "original" : {
+            "type" : "integer",
+            "description" : "原始金额，单位分，等于实付金额+平台优惠券金额+商家优惠券金额+支付渠道优惠，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          },
+          "actual_insured" : {
+            "type" : "integer",
+            "description" : "实际保费，单位分，保险公司扣除的，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          },
+          "coupon_pay" : {
+            "type" : "integer",
+            "description" : "券码实付金额，单位分，等于用户实付 + 支付优惠，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          },
+          "goods" : {
+            "type" : "integer",
+            "description" : "商家货款，单位分，商家最终提现金额，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          },
+          "pay" : {
+            "type" : "integer",
+            "description" : "实付金额，单位分，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          },
+          "merchant_ticket" : {
+            "type" : "integer",
+            "description" : "商家优惠券金额，单位分，不存在时为0",
+            "format" : "int32",
+            "example" : null
+          }
+        },
+        "description" : "金额",
+        "example" : null
+      },
+      "LedgerQueryCertificate" : {
+        "type" : "object",
+        "properties" : {
+          "certificate_id" : {
+            "type" : "string",
+            "description" : "券id，不存在时不返回",
+            "example" : null
+          },
+          "code" : {
+            "type" : "string",
+            "description" : "券码，不存在时不返回",
+            "example" : null
+          }
+        },
+        "description" : "券信息",
+        "example" : null
+      },
+      "LedgerQueryGoods" : {
+        "type" : "object",
+        "properties" : {
+          "group_name" : {
+            "type" : "string",
+            "description" : "团购名称，不存在时不返回",
+            "example" : null
+          },
+          "sold_start_time" : {
+            "type" : "integer",
+            "description" : "团购售卖开始时间，秒级时间戳",
+            "format" : "int32",
+            "example" : null
+          },
+          "sku_id" : {
+            "type" : "string",
+            "description" : "skuid",
+            "example" : null
+          }
+        },
+        "description" : "商品信息",
+        "example" : null
+      },
       "LedgerQueryByOrderResponse" : {
         "type" : "object",
         "properties" : {
           "data" : {
             "$ref" : "#/components/schemas/LedgerQueryByOrderData"
           },
-          "extra" : { }
+          "extra" : {
+            "$ref" : "#/components/schemas/extra"
+          }
         }
       },
       "LedgerQueryByOrderData" : {
@@ -10217,43 +11196,6 @@
           "extra" : {
             "$ref" : "#/components/schemas/extra"
           }
-        }
-      },
-      "RefundAuditRequest" : {
-        "type" : "object",
-        "properties" : {
-          "order_id" : {
-            "type" : "string",
-            "description" : "抖音侧订单 ID",
-            "default" : "10001",
-            "example" : null
-          },
-          "biz_uniq_key" : {
-            "type" : "string",
-            "description" : "业务唯一键",
-            "default" : "123456",
-            "example" : null
-          },
-          "audit_result" : {
-            "type" : "integer",
-            "description" : "退款审核结果，1 接受，2 拒绝",
-            "format" : "int32",
-            "default" : 1,
-            "example" : null
-          },
-          "refund_fee_amount" : {
-            "type" : "integer",
-            "description" : "通过审核时必须传，退款手续费金额，分",
-            "format" : "int32",
-            "default" : 2340,
-            "example" : null
-          }
-        }
-      },
-      "RefundAuditResponse" : {
-        "type" : "object",
-        "properties" : {
-          "extra" : { }
         }
       },
       "TicketQueryResponse" : {
