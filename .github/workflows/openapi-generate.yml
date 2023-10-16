@@ -1,0 +1,28 @@
+name: openapi-generate
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repository
+        uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: 'temurin'
+      - name: Cache maven dependencies
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-maven-repository
+        with:
+          path: |
+            ~/.m2/repository
+      - name: Run generator
+        run: mvn -pl generator clean install exec:java
+      - uses: stefanzweifel/git-auto-commit-action@v5  
