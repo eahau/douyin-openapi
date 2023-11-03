@@ -1,4 +1,6 @@
 # openapi-douyin
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Feahau%2Fdouyin-openapi.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Feahau%2Fdouyin-openapi?ref=badge_shield)
+
 
 本项目根据 [抖音开放平台](https://developer.open-douyin.com/) 的 OpenAPI 生成符合 [openapi](https://www.openapis.org/) 规范的 json 文件
 目前支持以下 api
@@ -49,3 +51,6 @@
 如果需要更正文档，烦请在相应模块下的 `openapi-manaual.json` 中维护。
 因为在生成 `openapi.json` 前，会以`openapi-manaual.json`为准，对重名的 [path](https://spec.openapis.org/oas/v3.1.0#paths-object) 和 [schema](https://spec.openapis.org/oas/v3.1.0#schemaObject) 进行覆盖。
 随后提交 [PR](https://github.com/eahau/douyin-openapi/pulls) 合并，感谢。
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Feahau%2Fdouyin-openapi.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Feahau%2Fdouyin-openapi?ref=badge_large)
